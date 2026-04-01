@@ -1,264 +1,1043 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>House Construction Tracker | घर निर्माण ट्रैकर</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>House Construction Tracker</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Noto Sans Devanagari'; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .header { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-        h1 { color: #d2691e; font-size: 28px; }
-        .lang-toggle { background: #d2691e; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; }
-        .nav { background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
-        .nav-btn { flex: 1; min-width: 120px; padding: 12px 10px; background: #f5f5f5; border: 2px solid #d2691e; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
-        .nav-btn.active { background: #d2691e; color: white; }
-        .view { background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: none; }
-        .view.active { display: block; }
-        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .kpi-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        .kpi-card h3 { font-size: 16px; margin-bottom: 5px; opacity: 0.9; }
-        .kpi-card .value { font-size: 24px; font-weight: bold; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #333; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; }
-        .btn-primary { background: #d2691e; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; width: 100%; }
-        .expense-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
-        .expense-table th, .expense-table td { padding: 10px; text-align: left; border-bottom: 1px solid #e0e0e0; }
-        .expense-table th { background: #f5f5f5; }
-        .hidden { display: none !important; }
-        .image-preview { max-width: 150px; margin-top: 10px; border-radius: 8px; border: 1px solid #ddd; }
-        .settings-card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-        .selector-box { background: #fff3e0; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; border: 2px dashed #d2691e; }
-        @media (max-width: 768px) { .container { padding: 10px; } h1 { font-size: 20px; } .nav-btn { min-width: 100%; } }
+        :root {
+            --bg: #f5efe6;
+            --surface: #fffaf3;
+            --surface-strong: #ffffff;
+            --ink: #2a211b;
+            --muted: #6f655d;
+            --accent: #b8602f;
+            --accent-dark: #91471d;
+            --border: #e8d9c9;
+            --success: #1f7a50;
+            --danger: #b33c2f;
+            --shadow: 0 20px 50px rgba(88, 55, 24, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Avenir Next", "Segoe UI", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at top left, rgba(184, 96, 47, 0.14), transparent 28%),
+                radial-gradient(circle at right, rgba(30, 122, 80, 0.12), transparent 24%),
+                var(--bg);
+        }
+
+        .container {
+            width: min(1120px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 32px 0 56px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, rgba(184, 96, 47, 0.92), rgba(145, 71, 29, 0.96));
+            color: white;
+            border-radius: 28px;
+            padding: 32px;
+            box-shadow: var(--shadow);
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.14);
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .hero h1 {
+            margin: 18px 0 12px;
+            font-size: clamp(32px, 6vw, 52px);
+            line-height: 1.02;
+        }
+
+        .hero p {
+            margin: 0;
+            max-width: 720px;
+            color: rgba(255, 255, 255, 0.86);
+            font-size: 17px;
+            line-height: 1.6;
+        }
+
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-top: 26px;
+        }
+
+        .mode-card {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 22px;
+            padding: 22px;
+        }
+
+        .mode-card h2 {
+            margin: 0 0 10px;
+            font-size: 22px;
+        }
+
+        .mode-card p {
+            margin-bottom: 16px;
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.84);
+        }
+
+        .shell {
+            display: grid;
+            gap: 22px;
+            margin-top: 22px;
+        }
+
+        .panel,
+        .stats-card {
+            background: var(--surface-strong);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .panel {
+            padding: 24px;
+        }
+
+        .panel-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .panel h2,
+        .panel h3 {
+            margin: 0;
+        }
+
+        .panel-copy {
+            margin: 8px 0 0;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .banner {
+            padding: 14px 18px;
+            border-radius: 18px;
+            border: 1px solid transparent;
+            font-weight: 600;
+        }
+
+        .banner.info {
+            background: #fff3df;
+            border-color: #f1d1aa;
+            color: #8a4c19;
+        }
+
+        .banner.success {
+            background: #e8f7ef;
+            border-color: #bfe2ce;
+            color: var(--success);
+        }
+
+        .banner.error {
+            background: #fde9e7;
+            border-color: #efc2bc;
+            color: var(--danger);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .kpi-grid {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        .stats-card {
+            padding: 20px;
+        }
+
+        .stats-card .label {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .stats-card .value {
+            margin-top: 10px;
+            font-size: clamp(28px, 5vw, 40px);
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .stats-card.accent {
+            background: linear-gradient(135deg, #b8602f, #cf8a57);
+            color: white;
+            border-color: transparent;
+        }
+
+        .stats-card.accent .label {
+            color: rgba(255, 255, 255, 0.78);
+        }
+
+        .owner-shell {
+            display: grid;
+            gap: 22px;
+        }
+
+        .owner-nav {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn,
+        .btn,
+        .secondary-btn {
+            border: none;
+            border-radius: 14px;
+            font: inherit;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .btn,
+        .secondary-btn {
+            padding: 12px 16px;
+            font-weight: 700;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn:hover,
+        .tab-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            cursor: wait;
+            opacity: 0.72;
+            transform: none;
+        }
+
+        .secondary-btn {
+            background: #f1e4d6;
+            color: var(--accent-dark);
+        }
+
+        .tab-btn {
+            padding: 12px 18px;
+            background: #f7efe5;
+            color: var(--accent-dark);
+            font-weight: 700;
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .form-group {
+            display: grid;
+            gap: 8px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--ink);
+            font: inherit;
+        }
+
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #efe3d6;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            color: var(--muted);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        .history-list {
+            display: grid;
+            gap: 14px;
+        }
+
+        .history-item {
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 18px;
+            background: var(--surface);
+        }
+
+        .history-item strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        .footer-note {
+            margin-top: 18px;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .inline-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 720px) {
+            .container {
+                width: min(100% - 20px, 1120px);
+                padding-top: 20px;
+            }
+
+            .hero,
+            .panel {
+                padding: 20px;
+                border-radius: 22px;
+            }
+
+            .panel-title-row {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1 id="mainTitle">House Construction Tracker</h1>
-            <button class="lang-toggle" onclick="toggleLanguage()">हिंदी / English</button>
-        </div>
+        <header class="hero">
+            <div class="eyebrow">House Construction Tracker</div>
+            <h1>Keep owner payments and contractor receipts in sync.</h1>
+            <p>
+                One clean page for the owner dashboard and one public contractor view to confirm how much has been paid,
+                received, and recorded with bill proof.
+            </p>
 
-        <div id="selectionView" class="view active">
-            <div class="selector-box">
-                <h2 id="selectTitle">Choose Your View | अपना दृश्य चुनें</h2>
-                <div class="form-group" style="margin-top: 20px;">
-                    <label id="selectLabel">I am a | मैं हूँ एक:</label>
-                    <select id="userType" onchange="handleUserTypeChange()">
-                        <option value="">-- Select --</option>
-                        <option value="contractor">Contractor | ठेकेदार</option>
-                        <option value="owner">Owner | मालिक</option>
-                    </select>
+            <div class="mode-grid">
+                <div class="mode-card">
+                    <h2>Contractor View</h2>
+                    <p>Choose a contractor name and see every recorded payment with amount, mode, and proof link.</p>
+                    <button class="btn" type="button" onclick="openContractorView()">Open Contractor View</button>
                 </div>
-                <div id="contractorSelector" class="hidden">
-                    <div class="form-group">
-                        <label id="whichConLabel">Select Your Name | अपना नाम चुनें:</label>
-                        <select id="selectedContractorName"></select>
+
+                <div class="mode-card">
+                    <h2>Owner Dashboard</h2>
+                    <p>Log in with the owner password to add expenses, manage contractors, update budget, and review history.</p>
+                    <button class="btn" type="button" onclick="openOwnerLogin()">Open Owner Login</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="shell">
+            <div id="banner" class="banner info hidden"></div>
+
+            <section id="contractorView" class="panel hidden">
+                <div class="panel-title-row">
+                    <div>
+                        <h2>Contractor Payments</h2>
+                        <p class="panel-copy">Pick a contractor to see how much has been paid and the proof saved by the owner.</p>
                     </div>
-                    <button class="btn-primary" onclick="showContractorView()">Go to My Payments</button>
+                    <button class="secondary-btn" type="button" onclick="hideSections()">Back to Home</button>
                 </div>
-                <div id="ownerButtonBox" class="hidden">
-                    <button class="btn-primary" onclick="showOwnerLogin()">Go to Owner Dashboard</button>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="contractorSelect">Contractor Name</label>
+                        <select id="contractorSelect"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button class="btn" type="button" onclick="loadContractorPayments()">Load Payments</button>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <div id="contractorView" class="view">
-            <h2 id="contractorTitle" style="margin-bottom: 20px; color: #d2691e;">Payment Proofs</h2>
-            <div class="kpi-grid">
-                <div class="kpi-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                    <h3 id="contractorTotalLabel">Total Paid</h3>
-                    <div class="value" id="contractorTotalPaid">₹0</div>
+                <div class="grid kpi-grid" style="margin-top: 18px;">
+                    <div class="stats-card accent">
+                        <div class="label">Total Received</div>
+                        <div class="value" id="contractorTotalPaid">Rs 0</div>
+                    </div>
                 </div>
-            </div>
-            <div style="overflow-x: auto;">
-                <table class="expense-table">
-                    <thead><tr><th id="thDate">Date</th><th id="thAmount">Amount</th><th id="thMode">Mode</th><th id="thProof">Proof</th></tr></thead>
-                    <tbody id="contractorPaymentsList"></tbody>
-                </table>
-            </div>
-            <button onclick="switchView('selection')" style="background: none; border: none; color: #666; margin-top: 30px; cursor: pointer; text-decoration: underline;">Back to Selection</button>
-        </div>
 
-        <div id="ownerLoginView" class="view">
-            <div style="text-align: center; max-width: 400px; margin: 0 auto;">
-                <h2 id="ownerLoginTitle">Owner Login</h2>
-                <p id="ownerLoginText" style="margin: 15px 0;">Enter owner password</p>
-                <input type="password" id="ownerPassword" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 8px; border: 2px solid #ddd;" />
-                <button class="btn-primary" onclick="verifyOwner()">Unlock</button>
-                <div id="ownerError" style="color: red; margin-top: 10px;"></div>
-                <button onclick="switchView('selection')" style="background: none; border: none; color: #666; margin-top: 20px; cursor: pointer;">Back</button>
-            </div>
-        </div>
+                <div class="table-wrap" style="margin-top: 18px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Mode</th>
+                                <th>Proof</th>
+                            </tr>
+                        </thead>
+                        <tbody id="contractorPaymentsBody"></tbody>
+                    </table>
+                </div>
+            </section>
 
-        <div id="ownerNav" class="nav hidden">
-            <button class="nav-btn active" onclick="switchView('dashboard')" id="navDashboard">Dashboard</button>
-            <button class="nav-btn" onclick="switchView('addExpense')" id="navAddExpense">Add Expense</button>
-            <button class="nav-btn" onclick="switchView('history')" id="navHistory">History</button>
-            <button class="nav-btn" onclick="switchView('settings')" id="navSettings">Settings</button>
-        </div>
+            <section id="ownerLoginView" class="panel hidden">
+                <div class="panel-title-row">
+                    <div>
+                        <h2>Owner Login</h2>
+                        <p class="panel-copy">Enter the password configured in the Apps Script project.</p>
+                    </div>
+                    <button class="secondary-btn" type="button" onclick="hideSections()">Back to Home</button>
+                </div>
 
-        <div id="dashboardView" class="view">
-            <h2 id="dashTitle" style="margin-bottom: 20px;">Owner Dashboard</h2>
-            <div class="kpi-grid">
-                <div class="kpi-card"><h3 id="kpiTotalBudget">Budget</h3><div class="value" id="totalBudget">₹0</div></div>
-                <div class="kpi-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);"><h3 id="kpiTotalSpent">Spent</h3><div class="value" id="totalSpent">₹0</div></div>
-                <div class="kpi-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);"><h3 id="kpiContractorPaid">Contractor</h3><div class="value" id="contractorSpent">₹0</div></div>
-                <div class="kpi-card" style="background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);"><h3 id="kpiMaterialSpent">Material</h3><div class="value" id="materialSpent">₹0</div></div>
-            </div>
-            <h3 id="recentExpensesTitle">Recent Expenses</h3>
-            <div style="overflow-x: auto;"><table class="expense-table"><thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th></tr></thead><tbody id="recentExpensesList"></tbody></table></div>
-        </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="ownerPassword">Owner Password</label>
+                        <input id="ownerPassword" type="password" placeholder="Enter password" />
+                    </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button class="btn" type="button" onclick="loginOwner()">Unlock Dashboard</button>
+                    </div>
+                </div>
+                <p id="ownerLoginMessage" class="footer-note"></p>
+            </section>
 
-        <div id="addExpenseView" class="view">
-            <h2 id="addExpenseTitle">Add Expense</h2>
-            <form id="expenseForm" style="margin-top: 20px;">
-                <div class="form-group"><label id="labelDate">Date</label><input type="date" id="expenseDate" required /></div>
-                <div class="form-group"><label id="labelCategory">Category</label><select id="expenseCategory" required onchange="togglePaidToDropdown()"><option value="Material">Material | सामग्री</option><option value="Contractor">Contractor | ठेकेदार</option><option value="Equipment">Equipment | उपकरण</option><option value="Miscellaneous">Miscellaneous | विविध</option></select></div>
-                <div class="form-group"><label id="labelDescription">Description</label><input type="text" id="expenseDescription" required /></div>
-                <div class="form-group"><label id="labelAmount">Amount (₹)</label><input type="number" id="expenseAmount" required /></div>
-                <div class="form-group"><label id="labelPaymentMode">Payment Mode</label><select id="expensePaymentMode" required><option value="UPI">UPI</option><option value="Cash">Cash</option><option value="Bank">Bank</option></select></div>
-                <div class="form-group"><label id="labelPaidTo">Paid To</label><div id="paidToContainer"><input type="text" id="expensePaidTo" required /></div></div>
-                <div class="form-group"><label id="labelScreenshot">Screenshot / Bill</label><input type="file" id="expenseScreenshot" accept="image/*" /><img id="screenshotPreview" class="image-preview hidden" /></div>
-                <button type="submit" class="btn-primary" id="btnSubmit">Save Expense</button>
-            </form>
-        </div>
+            <section id="ownerSection" class="owner-shell hidden">
+                <div class="panel">
+                    <div class="panel-title-row">
+                        <div>
+                            <h2>Owner Dashboard</h2>
+                            <p class="panel-copy">Track total budget, payments to contractors, material spending, and every expense entry.</p>
+                        </div>
+                        <button class="secondary-btn" type="button" onclick="logoutOwner()">Log Out</button>
+                    </div>
 
-        <div id="historyView" class="view"><h2 id="historyTitle">Full History</h2><div id="historyList" style="margin-top: 20px;"></div></div>
+                    <div class="owner-nav">
+                        <button id="tabDashboardBtn" class="tab-btn active" type="button" onclick="switchTab('dashboard')">Dashboard</button>
+                        <button id="tabAddExpenseBtn" class="tab-btn" type="button" onclick="switchTab('addExpense')">Add Expense</button>
+                        <button id="tabHistoryBtn" class="tab-btn" type="button" onclick="switchTab('history')">History</button>
+                        <button id="tabSettingsBtn" class="tab-btn" type="button" onclick="switchTab('settings')">Settings</button>
+                    </div>
+                </div>
 
-        <div id="settingsView" class="view">
-            <h2 id="settingsTitle">Settings</h2>
-            <div class="settings-card" style="margin-top: 20px;">
-                <h3>Set Budget</h3>
-                <div class="form-group"><label>Total Budget</label><input type="number" id="setBudgetTotal" /></div>
-                <button class="btn-primary" onclick="updateBudgets()">Save Budget</button>
-            </div>
-            <div class="settings-card">
-                <h3>Add Contractor</h3>
-                <div class="form-group"><label>Name</label><input type="text" id="newConName" /></div>
-                <div class="form-group"><label>Agreed Amount</label><input type="number" id="newConAgreed" /></div>
-                <button class="btn-primary" onclick="addContractor()">Add Contractor</button>
-            </div>
+                <section id="dashboardTab" class="panel tab-panel active">
+                    <div class="grid kpi-grid">
+                        <div class="stats-card accent">
+                            <div class="label">Total Budget</div>
+                            <div class="value" id="budgetValue">Rs 0</div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="label">Total Spent</div>
+                            <div class="value" id="spentValue">Rs 0</div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="label">Paid To Contractors</div>
+                            <div class="value" id="contractorSpentValue">Rs 0</div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="label">Material Spend</div>
+                            <div class="value" id="materialSpentValue">Rs 0</div>
+                        </div>
+                    </div>
+
+                    <div class="panel" style="margin-top: 18px; padding: 20px;">
+                        <div class="panel-title-row" style="margin-bottom: 12px;">
+                            <h3>Recent Expenses</h3>
+                        </div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Category</th>
+                                        <th>Description</th>
+                                        <th>Paid To</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentExpensesBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="addExpenseTab" class="panel tab-panel">
+                    <div class="panel-title-row">
+                        <div>
+                            <h3>Add Expense</h3>
+                            <p class="panel-copy">Use this form for both contractor payments and material or equipment purchases.</p>
+                        </div>
+                    </div>
+
+                    <form id="expenseForm" class="grid">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="expenseDate">Date</label>
+                                <input id="expenseDate" type="date" required />
+                            </div>
+                            <div class="form-group">
+                                <label for="expenseCategory">Category</label>
+                                <select id="expenseCategory" required onchange="renderPaidToInput()">
+                                    <option value="Material">Material</option>
+                                    <option value="Contractor">Contractor</option>
+                                    <option value="Equipment">Equipment</option>
+                                    <option value="Miscellaneous">Miscellaneous</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="expenseAmount">Amount</label>
+                                <input id="expenseAmount" type="number" min="0" step="0.01" required />
+                            </div>
+                            <div class="form-group">
+                                <label for="expensePaymentMode">Payment Mode</label>
+                                <select id="expensePaymentMode" required>
+                                    <option value="UPI">UPI</option>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Bank Transfer">Bank Transfer</option>
+                                    <option value="Cheque">Cheque</option>
+                                </select>
+                            </div>
+                            <div class="form-group full">
+                                <label for="expenseDescription">Description</label>
+                                <textarea id="expenseDescription" placeholder="Example: Cement bags, shuttering labour, plumbing advance" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="paidToContainer">Paid To</label>
+                                <div id="paidToContainer">
+                                    <input id="expensePaidTo" type="text" placeholder="Enter vendor or contractor name" required />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="expenseScreenshot">Bill / Screenshot</label>
+                                <input id="expenseScreenshot" type="file" accept="image/*" />
+                            </div>
+                        </div>
+
+                        <div class="inline-actions">
+                            <button id="saveExpenseBtn" class="btn" type="submit">Save Expense</button>
+                            <button class="secondary-btn" type="button" onclick="document.getElementById('expenseForm').reset(); renderPaidToInput();">Clear Form</button>
+                        </div>
+                    </form>
+                </section>
+
+                <section id="historyTab" class="panel tab-panel">
+                    <div class="panel-title-row">
+                        <div>
+                            <h3>Expense History</h3>
+                            <p class="panel-copy">Every saved payment and purchase appears here in reverse chronological order.</p>
+                        </div>
+                    </div>
+                    <div id="historyList" class="history-list"></div>
+                </section>
+
+                <section id="settingsTab" class="panel tab-panel">
+                    <div class="form-grid">
+                        <form id="budgetForm" class="panel" style="padding: 20px; margin: 0;">
+                            <div class="panel-title-row" style="margin-bottom: 12px;">
+                                <h3>Set Total Budget</h3>
+                            </div>
+                            <div class="form-group">
+                                <label for="totalBudgetInput">Budget Amount</label>
+                                <input id="totalBudgetInput" type="number" min="0" step="0.01" required />
+                            </div>
+                            <button class="btn" type="submit">Save Budget</button>
+                        </form>
+
+                        <form id="contractorForm" class="panel" style="padding: 20px; margin: 0;">
+                            <div class="panel-title-row" style="margin-bottom: 12px;">
+                                <h3>Add Contractor</h3>
+                            </div>
+                            <div class="form-group">
+                                <label for="contractorNameInput">Name</label>
+                                <input id="contractorNameInput" type="text" required />
+                            </div>
+                            <div class="form-group">
+                                <label for="contractorPhoneInput">Phone</label>
+                                <input id="contractorPhoneInput" type="text" />
+                            </div>
+                            <div class="form-group">
+                                <label for="contractorWorkTypeInput">Work Type</label>
+                                <input id="contractorWorkTypeInput" type="text" placeholder="Civil, plumbing, electrical..." />
+                            </div>
+                            <div class="form-group">
+                                <label for="contractorAgreedAmountInput">Agreed Amount</label>
+                                <input id="contractorAgreedAmountInput" type="number" min="0" step="0.01" />
+                            </div>
+                            <button class="btn" type="submit">Save Contractor</button>
+                        </form>
+                    </div>
+
+                    <p class="footer-note">
+                        Important: replace <code>__APPS_SCRIPT_WEB_APP_URL__</code> in this file after you deploy the Apps Script web app.
+                        If you skip that step, login and contractor data will not work.
+                    </p>
+                </section>
+            </section>
         </div>
     </div>
 
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbwcgQ23k88P8Vjw4yskGjF7cdnqPxvr861MbAATcXTXAYPCrqrH7m1Eb7WyFzgTdB-5/exec';
-        let currentLang = 'en'; let ownerSecret = ''; let contractors = [];
-        const translations = {
-            en: { mainTitle: 'House Construction Tracker', selectTitle: 'Choose Your View', selectLabel: 'I am a', contractorTitle: 'Payment Proofs', contractorTotalLabel: 'Total Paid', thDate: 'Date', thAmount: 'Amount', thMode: 'Mode', thProof: 'Proof', ownerLoginTitle: 'Owner Login', ownerLoginText: 'Enter owner password', dashTitle: 'Owner Dashboard', kpiTotalBudget: 'Budget', kpiTotalSpent: 'Spent', kpiContractorPaid: 'Contractor', kpiMaterialSpent: 'Material', recentExpensesTitle: 'Recent Expenses', navDashboard: 'Dashboard', navAddExpense: 'Add Expense', navHistory: 'History', navSettings: 'Settings', addExpenseTitle: 'Add Expense', labelDate: 'Date', labelCategory: 'Category', labelDescription: 'Description', labelAmount: 'Amount (₹)', labelPaymentMode: 'Payment Mode', labelPaidTo: 'Paid To', labelScreenshot: 'Screenshot / Bill', btnSubmit: 'Save Expense', historyTitle: 'Full History', settingsTitle: 'Settings' },
-            hi: { mainTitle: 'घर निर्माण ट्रैकर', selectTitle: 'अपना दृश्य चुनें', selectLabel: 'मैं हूँ एक', contractorTitle: 'भुगतान प्रमाण', contractorTotalLabel: 'कुल भुगतान', thDate: 'तारीख', thAmount: 'राशि', thMode: 'तरीका', thProof: 'प्रमाण', ownerLoginTitle: 'मालिक लॉगिन', ownerLoginText: 'पासवर्ड डालें', dashTitle: 'मालिक डैशबोर्ड', kpiTotalBudget: 'बजट', kpiTotalSpent: 'खर्च', kpiContractorPaid: 'ठेकेदार', kpiMaterialSpent: 'सामग्री', recentExpensesTitle: 'हाल के खर्च', navDashboard: 'डैशबोर्ड', navAddExpense: 'खर्च जोड़ें', navHistory: 'इतिहास', navSettings: 'सेटिंग्स', addExpenseTitle: 'खर्च जोड़ें', labelDate: 'तारीख', labelCategory: 'श्रेणी', labelDescription: 'विवरण', labelAmount: 'राशि (₹)', labelPaymentMode: 'भुगतान तरीका', labelPaidTo: 'किसे भुगतान', labelScreenshot: 'स्क्रीनशॉट / बिल', btnSubmit: 'खर्च सहेजें', historyTitle: 'पूरा इतिहास', settingsTitle: 'सेटिंग्स' }
+        const CONFIG = {
+            API_URL: "__APPS_SCRIPT_WEB_APP_URL__",
+            PUBLIC_TOKEN: "PUBLIC"
         };
-        function toggleLanguage() { currentLang = currentLang === 'en' ? 'hi' : 'en'; updateUI(); }
-        function updateUI() { const t = translations[currentLang]; for (let id in t) { const el = document.getElementById(id); if (el) el.innerText = t[id]; } }
-        function handleUserTypeChange() {
-            const type = document.getElementById('userType').value;
-            document.getElementById('contractorSelector').classList.toggle('hidden', type !== 'contractor');
-            document.getElementById('ownerButtonBox').classList.toggle('hidden', type !== 'owner');
-            if (type === 'contractor') loadContractorNames();
+
+        const state = {
+            ownerSecret: "",
+            contractors: []
+        };
+
+        const currency = new Intl.NumberFormat("en-IN", {
+            style: "currency",
+            currency: "INR",
+            maximumFractionDigits: 0
+        });
+
+        function byId(id) {
+            return document.getElementById(id);
         }
-        async function loadContractorNames() {
-            const sel = document.getElementById('selectedContractorName');
-            sel.innerHTML = '<option>Loading...</option>';
-            try {
-                const res = await fetch(`${API_URL}?action=getContractors&secret=PUBLIC`);
-                const data = await res.json();
-                sel.innerHTML = data.contractors.map(c => `<option value="${c.Name}">${c.Name}</option>`).join('');
-            } catch(e) { sel.innerHTML = '<option>Error</option>'; }
+
+        function formatMoney(value) {
+            return currency.format(Number(value || 0));
         }
-        function showContractorView() {
-            const name = document.getElementById('selectedContractorName').value;
-            if (!name) return;
-            switchView('contractor');
-            loadContractorPayments(name);
+
+        function showBanner(message, tone) {
+            const banner = byId("banner");
+            banner.textContent = message;
+            banner.className = `banner ${tone || "info"}`;
+            banner.classList.remove("hidden");
         }
-        function switchView(viewId) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById(viewId + 'View').classList.add('active');
-            if (ownerSecret) {
-                document.getElementById('ownerNav').classList.toggle('hidden', viewId === 'selection' || viewId === 'contractor');
-                if (viewId === 'dashboard') loadDashboard();
-                if (viewId === 'history') loadHistory();
+
+        function hideBanner() {
+            byId("banner").classList.add("hidden");
+        }
+
+        function looksLikeHtmlError(text) {
+            const normalized = String(text || "").trim().toLowerCase();
+            return normalized.startsWith("<!doctype html") ||
+                normalized.startsWith("<html") ||
+                normalized.includes("file you have requested does not exist") ||
+                normalized.includes("google drive");
+        }
+
+        function ensureApiConfigured() {
+            if (!CONFIG.API_URL || CONFIG.API_URL.includes("__APPS_SCRIPT_WEB_APP_URL__")) {
+                throw new Error("API_URL is not configured yet. Replace __APPS_SCRIPT_WEB_APP_URL__ in index.html with the deployed Apps Script /exec URL.");
             }
         }
-        function showOwnerLogin() { switchView('ownerLogin'); }
-        async function verifyOwner() {
-            const pass = document.getElementById('ownerPassword').value;
-            document.getElementById('ownerError').innerText = 'Unlocking...';
+
+        async function parseApiResponse(response) {
+            const text = await response.text();
+
+            if (looksLikeHtmlError(text)) {
+                throw new Error("The Apps Script web app URL is invalid or the deployment no longer exists. Redeploy the script and update API_URL.");
+            }
+
+            let data;
             try {
-                const res = await fetch(`${API_URL}?action=getSummary&secret=${encodeURIComponent(pass)}`);
-                const data = await res.json();
-                if (data.error) throw new Error();
-                ownerSecret = pass;
-                document.getElementById('ownerNav').classList.remove('hidden');
-                switchView('dashboard');
-                const conRes = await fetch(`${API_URL}?action=getContractors&secret=${encodeURIComponent(ownerSecret)}`);
-                const conData = await conRes.json(); contractors = conData.contractors;
-            } catch (err) { document.getElementById('ownerError').innerText = 'Wrong Password!'; }
+                data = JSON.parse(text);
+            } catch (error) {
+                throw new Error("The backend did not return valid JSON. Check the Apps Script deployment and web app access settings.");
+            }
+
+            if (data && data.error) {
+                throw new Error(data.error);
+            }
+
+            return data;
         }
-        async function loadContractorPayments(name) {
-            const res = await fetch(`${API_URL}?action=getContractorPayments&contractorName=${encodeURIComponent(name)}`);
-            const data = await res.json();
-            document.getElementById('contractorPaymentsList').innerHTML = data.payments.map(p => `<tr><td>${p.Date}</td><td>₹${p.Amount}</td><td>${p.Payment_Mode}</td><td>${p.Screenshot_URL ? `<a href="${p.Screenshot_URL}" target="_blank">View</a>` : '-'}</td></tr>`).join('');
-            document.getElementById('contractorTotalPaid').innerText = `₹${data.total}`;
-            document.getElementById('contractorTitle').innerText = `${name} - Payments`;
+
+        async function apiGet(action, params) {
+            ensureApiConfigured();
+
+            const url = new URL(CONFIG.API_URL);
+            url.searchParams.set("action", action);
+
+            Object.entries(params || {}).forEach(([key, value]) => {
+                if (value !== undefined && value !== null && value !== "") {
+                    url.searchParams.set(key, value);
+                }
+            });
+
+            const response = await fetch(url.toString());
+            return parseApiResponse(response);
         }
+
+        async function apiPost(action, payload) {
+            ensureApiConfigured();
+
+            const response = await fetch(CONFIG.API_URL, {
+                method: "POST",
+                body: JSON.stringify({ action, ...(payload || {}) })
+            });
+
+            return parseApiResponse(response);
+        }
+
+        function openContractorView() {
+            hideSections();
+            byId("contractorView").classList.remove("hidden");
+            loadContractors();
+        }
+
+        function openOwnerLogin() {
+            hideSections();
+            byId("ownerLoginView").classList.remove("hidden");
+            byId("ownerPassword").focus();
+        }
+
+        function hideSections() {
+            hideBanner();
+            byId("contractorView").classList.add("hidden");
+            byId("ownerLoginView").classList.add("hidden");
+            byId("ownerSection").classList.add("hidden");
+        }
+
+        function logoutOwner() {
+            state.ownerSecret = "";
+            byId("ownerPassword").value = "";
+            hideSections();
+            showBanner("Owner session closed.", "info");
+        }
+
+        function switchTab(tabName) {
+            const names = ["dashboard", "addExpense", "history", "settings"];
+
+            names.forEach((name) => {
+                byId(`${name}Tab`).classList.toggle("active", name === tabName);
+                byId(`tab${name.charAt(0).toUpperCase()}${name.slice(1)}Btn`).classList.toggle("active", name === tabName);
+            });
+        }
+
+        function renderContractorSelects() {
+            const contractorOptions = state.contractors
+                .map((contractor) => `<option value="${escapeHtml(contractor.Name)}">${escapeHtml(contractor.Name)}</option>`)
+                .join("");
+
+            byId("contractorSelect").innerHTML = contractorOptions || '<option value="">No contractors found</option>';
+
+            renderPaidToInput();
+        }
+
+        function renderPaidToInput() {
+            const category = byId("expenseCategory").value;
+
+            if (category === "Contractor" && state.contractors.length > 0) {
+                byId("paidToContainer").innerHTML = `
+                    <select id="expensePaidTo" required>
+                        ${state.contractors.map((contractor) => `<option value="${escapeHtml(contractor.Name)}">${escapeHtml(contractor.Name)}</option>`).join("")}
+                    </select>
+                `;
+                return;
+            }
+
+            byId("paidToContainer").innerHTML = '<input id="expensePaidTo" type="text" placeholder="Enter vendor or contractor name" required />';
+        }
+
+        async function loadContractors() {
+            try {
+                const data = await apiGet("getContractors", { secret: CONFIG.PUBLIC_TOKEN });
+                state.contractors = Array.isArray(data.contractors) ? data.contractors : [];
+                renderContractorSelects();
+
+                if (!state.contractors.length) {
+                    showBanner("No contractors have been added yet.", "info");
+                } else {
+                    hideBanner();
+                }
+            } catch (error) {
+                showBanner(error.message, "error");
+            }
+        }
+
+        async function loadContractorPayments() {
+            const contractorName = byId("contractorSelect").value;
+
+            if (!contractorName) {
+                showBanner("Select a contractor first.", "info");
+                return;
+            }
+
+            try {
+                const data = await apiGet("getContractorPayments", { contractorName });
+                const payments = Array.isArray(data.payments) ? data.payments : [];
+
+                byId("contractorTotalPaid").textContent = formatMoney(data.total || 0);
+                byId("contractorPaymentsBody").innerHTML = payments.length
+                    ? payments.map((payment) => `
+                        <tr>
+                            <td>${escapeHtml(payment.Date)}</td>
+                            <td>${escapeHtml(payment.Description)}</td>
+                            <td>${formatMoney(payment.Amount)}</td>
+                            <td>${escapeHtml(payment.PaymentMode)}</td>
+                            <td>${payment.ScreenshotUrl ? `<a href="${payment.ScreenshotUrl}" target="_blank" rel="noreferrer">View Proof</a>` : "-"}</td>
+                        </tr>
+                    `).join("")
+                    : '<tr><td colspan="5" class="muted">No payments recorded yet for this contractor.</td></tr>';
+
+                hideBanner();
+            } catch (error) {
+                showBanner(error.message, "error");
+            }
+        }
+
+        async function loginOwner() {
+            const password = byId("ownerPassword").value.trim();
+
+            if (!password) {
+                byId("ownerLoginMessage").textContent = "Enter the owner password first.";
+                return;
+            }
+
+            byId("ownerLoginMessage").textContent = "Checking password...";
+
+            try {
+                await apiGet("getSummary", { secret: password });
+                state.ownerSecret = password;
+                byId("ownerLoginMessage").textContent = "";
+                hideSections();
+                byId("ownerSection").classList.remove("hidden");
+                switchTab("dashboard");
+                await refreshOwnerData();
+                showBanner("Owner dashboard unlocked successfully.", "success");
+            } catch (error) {
+                byId("ownerLoginMessage").textContent = error.message;
+            }
+        }
+
+        async function refreshOwnerData() {
+            await Promise.all([loadOwnerContractors(), loadDashboard(), loadHistory()]);
+        }
+
+        async function loadOwnerContractors() {
+            const data = await apiGet("getContractors", { secret: state.ownerSecret });
+            state.contractors = Array.isArray(data.contractors) ? data.contractors : [];
+            renderContractorSelects();
+        }
+
         async function loadDashboard() {
-            const res = await fetch(`${API_URL}?action=getSummary&secret=${encodeURIComponent(ownerSecret)}`);
-            const data = await res.json();
-            document.getElementById('totalBudget').innerText = `₹${data.totalBudget}`;
-            document.getElementById('totalSpent').innerText = `₹${data.summary.total}`;
-            document.getElementById('contractorSpent').innerText = `₹${data.summary.Contractor}`;
-            document.getElementById('materialSpent').innerText = `₹${data.summary.Material}`;
-            document.getElementById('recentExpensesList').innerHTML = data.recentExpenses.map(p => `<tr><td>${p.Date}</td><td>${p.Category}</td><td>${p.Description}</td><td>₹${p.Amount}</td></tr>`).join('');
+            const data = await apiGet("getSummary", { secret: state.ownerSecret });
+            const summary = data.summary || {};
+
+            byId("budgetValue").textContent = formatMoney(data.totalBudget || 0);
+            byId("spentValue").textContent = formatMoney(summary.total || 0);
+            byId("contractorSpentValue").textContent = formatMoney(summary.Contractor || 0);
+            byId("materialSpentValue").textContent = formatMoney(summary.Material || 0);
+            byId("totalBudgetInput").value = Number(data.totalBudget || 0);
+
+            const recentExpenses = Array.isArray(data.recentExpenses) ? data.recentExpenses : [];
+            byId("recentExpensesBody").innerHTML = recentExpenses.length
+                ? recentExpenses.map((expense) => `
+                    <tr>
+                        <td>${escapeHtml(expense.Date)}</td>
+                        <td>${escapeHtml(expense.Category)}</td>
+                        <td>${escapeHtml(expense.Description)}</td>
+                        <td>${escapeHtml(expense.PaidTo)}</td>
+                        <td>${formatMoney(expense.Amount)}</td>
+                    </tr>
+                `).join("")
+                : '<tr><td colspan="5" class="muted">No expenses recorded yet.</td></tr>';
         }
+
         async function loadHistory() {
-            const res = await fetch(`${API_URL}?action=getExpenses&secret=${encodeURIComponent(ownerSecret)}`);
-            const data = await res.json();
-            document.getElementById('historyList').innerHTML = data.expenses.reverse().map(p => `<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 8px;"><strong>${p.Date} - ${p.Category}</strong><br><span>${p.Description}</span><br><span style="color: #d2691e; font-weight: bold;">₹${p.Amount} (${p.Payment_Mode})</span><br><span>To: ${p.Paid_To}</span>${p.Screenshot_URL ? `<br><a href="${p.Screenshot_URL}" target="_blank">View Bill</a>` : ''}</div>`).join('');
+            const data = await apiGet("getExpenses", { secret: state.ownerSecret });
+            const expenses = Array.isArray(data.expenses) ? data.expenses : [];
+
+            byId("historyList").innerHTML = expenses.length
+                ? expenses.map((expense) => `
+                    <article class="history-item">
+                        <strong>${escapeHtml(expense.Date)} · ${escapeHtml(expense.Category)} · ${formatMoney(expense.Amount)}</strong>
+                        <div>${escapeHtml(expense.Description)}</div>
+                        <div class="muted" style="margin-top: 8px;">Paid To: ${escapeHtml(expense.PaidTo)} · Mode: ${escapeHtml(expense.PaymentMode)}</div>
+                        ${expense.ScreenshotUrl ? `<div style="margin-top: 10px;"><a href="${expense.ScreenshotUrl}" target="_blank" rel="noreferrer">Open Bill / Screenshot</a></div>` : ""}
+                    </article>
+                `).join("")
+                : '<div class="history-item muted">No expenses recorded yet.</div>';
         }
-        function togglePaidToDropdown() {
-            const cat = document.getElementById('expenseCategory').value;
-            const container = document.getElementById('paidToContainer');
-            if (cat === 'Contractor' && contractors.length > 0) {
-                container.innerHTML = `<select id="expensePaidTo">${contractors.map(c => `<option value="${c.Name}">${c.Name}</option>`).join('')}</select>`;
-            } else {
-                container.innerHTML = `<input type="text" id="expensePaidTo" required />`;
+
+        async function saveExpense(event) {
+            event.preventDefault();
+
+            const saveButton = byId("saveExpenseBtn");
+            saveButton.disabled = true;
+            saveButton.textContent = "Saving...";
+
+            try {
+                let screenshotUrl = "";
+                const file = byId("expenseScreenshot").files[0];
+
+                if (file) {
+                    const dataUrl = await fileToDataUrl(file);
+                    const upload = await apiPost("uploadImage", {
+                        secret: state.ownerSecret,
+                        imageData: dataUrl.split(",")[1],
+                        mimeType: file.type,
+                        fileName: file.name
+                    });
+                    screenshotUrl = upload.url || "";
+                }
+
+                await apiPost("addExpense", {
+                    secret: state.ownerSecret,
+                    date: byId("expenseDate").value,
+                    category: byId("expenseCategory").value,
+                    description: byId("expenseDescription").value.trim(),
+                    amount: byId("expenseAmount").value,
+                    paymentMode: byId("expensePaymentMode").value,
+                    paidTo: byId("expensePaidTo").value.trim(),
+                    screenshotUrl
+                });
+
+                byId("expenseForm").reset();
+                setToday();
+                renderPaidToInput();
+                await refreshOwnerData();
+                switchTab("dashboard");
+                showBanner("Expense saved successfully.", "success");
+            } catch (error) {
+                showBanner(error.message, "error");
+            } finally {
+                saveButton.disabled = false;
+                saveButton.textContent = "Save Expense";
             }
         }
-        document.getElementById('expenseScreenshot').onchange = function(e) {
-            const reader = new FileReader();
-            reader.onload = () => { document.getElementById('screenshotPreview').src = reader.result; document.getElementById('screenshotPreview').classList.remove('hidden'); };
-            reader.readAsDataURL(e.target.files[0]);
-        };
-        document.getElementById('expenseForm').onsubmit = async function(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btnSubmit'); btn.innerText = 'Saving...'; btn.disabled = true;
-            let screenshotUrl = '';
-            const file = document.getElementById('expenseScreenshot').files[0];
-            if (file) {
-                const base64 = document.getElementById('screenshotPreview').src.split(',')[1];
-                const resImg = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'uploadImage', secret: ownerSecret, imageData: base64, mimeType: file.type, fileName: file.name }) });
-                const dataImg = await resImg.json(); screenshotUrl = dataImg.url || '';
+
+        async function saveBudget(event) {
+            event.preventDefault();
+
+            try {
+                await apiPost("updateBudget", {
+                    secret: state.ownerSecret,
+                    amount: byId("totalBudgetInput").value
+                });
+
+                await loadDashboard();
+                showBanner("Budget updated successfully.", "success");
+            } catch (error) {
+                showBanner(error.message, "error");
             }
-            const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'addExpense', secret: ownerSecret, date: document.getElementById('expenseDate').value, category: document.getElementById('expenseCategory').value, description: document.getElementById('expenseDescription').value, amount: document.getElementById('expenseAmount').value, paymentMode: document.getElementById('expensePaymentMode').value, paidTo: document.getElementById('expensePaidTo').value, screenshotUrl }) });
-            const data = await res.json(); if (data.success) { alert('Saved!'); document.getElementById('expenseForm').reset(); document.getElementById('screenshotPreview').classList.add('hidden'); switchView('dashboard'); }
-            btn.innerText = translations[currentLang].btnSubmit; btn.disabled = false;
-        };
-        async function updateBudgets() {
-            const val = document.getElementById('setBudgetTotal').value;
-            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateBudget', secret: ownerSecret, amount: val }) });
-            alert('Budget Updated!'); loadDashboard();
         }
-        async function addContractor() {
-            const name = document.getElementById('newConName').value;
-            const agreed = document.getElementById('newConAgreed').value;
-            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'addContractor', secret: ownerSecret, name, agreedAmount: agreed }) });
-            alert('Contractor Added!');
+
+        async function saveContractor(event) {
+            event.preventDefault();
+
+            try {
+                await apiPost("addContractor", {
+                    secret: state.ownerSecret,
+                    name: byId("contractorNameInput").value.trim(),
+                    phone: byId("contractorPhoneInput").value.trim(),
+                    workType: byId("contractorWorkTypeInput").value.trim(),
+                    agreedAmount: byId("contractorAgreedAmountInput").value
+                });
+
+                byId("contractorForm").reset();
+                await loadOwnerContractors();
+                showBanner("Contractor saved successfully.", "success");
+            } catch (error) {
+                showBanner(error.message, "error");
+            }
         }
-        updateUI();
+
+        function fileToDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error("Could not read the selected file."));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function setToday() {
+            byId("expenseDate").value = new Date().toISOString().slice(0, 10);
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? "")
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#39;");
+        }
+
+        byId("expenseForm").addEventListener("submit", saveExpense);
+        byId("budgetForm").addEventListener("submit", saveBudget);
+        byId("contractorForm").addEventListener("submit", saveContractor);
+        setToday();
+        renderPaidToInput();
     </script>
 </body>
-</html> Enter
+</html>
