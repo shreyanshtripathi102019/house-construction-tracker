@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Construction Tracker | घर निर्माण ट्रैकर</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Noto Sans Devanagari'; 
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { 
+            background: #fff; 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        h1 { color: #d2691e; font-size: 28px; }
+        .lang-toggle { 
+            background: #d2691e; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 8px; 
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .nav { 
+            background: #fff; 
+            padding: 15px; 
+            border-radius: 12px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .nav-btn { 
+            flex: 1; 
+            min-width: 150px; 
+            padding: 12px 20px; 
+            background: #f5f5f5; 
+            border: 2px solid #d2691e; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .nav-btn.active { background: #d2691e; color: white; }
+        .view { 
+            background: #fff; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: none;
+        }
+        .view.active { display: block; }
+        .kpi-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 20px; 
+            margin-bottom: 30px;
+        }
+        .kpi-card { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            padding: 25px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .kpi-card h3 { font-size: 18px; margin-bottom: 10px; opacity: 0.9; }
+        .kpi-card .value { font-size: 32px; font-weight: bold; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
+        .form-group input, .form-group select, .form-group textarea { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 8px; 
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { 
+            border-color: #d2691e; 
+            outline: none;
+        }
+        .btn-primary { 
+            background: #d2691e; 
+            color: white; 
+            border: none; 
+            padding: 14px 30px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 18px;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        .btn-primary:hover { background: #b8601a; }
+        .expense-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .expense-table th, .expense-table td { padding: 12px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+        .expense-table th { background: #f5f5f5; font-weight: 600; }
+        .contractor-view { background: #fffbf0; }
+        .contractor-view .kpi-card { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .owner-lock { 
+            background: #fff3cd; 
+            border: 2px solid #ffc107; 
+            padding: 30px; 
+            border-radius: 12px; 
+            text-align: center;
+        }
+        .owner-lock input { 
+            max-width: 300px; 
+            margin: 20px auto; 
+            display: block;
+        }
+        .hidden { display: none !important; }
+        .image-preview { max-width: 200px; margin-top: 10px; border-radius: 8px; }
+        @media (max-width: 768px) {
+            h1 { font-size: 22px; }
+            .kpi-grid { grid-template-columns: 1fr; }
+            .nav { flex-direction: column; }
+            .nav-btn { min-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 id="mainTitle">House Construction Tracker</h1>
+            <button class="lang-toggle" onclick="toggleLanguage()">हिंदी / English</button>
+        </div>
+
+        <div id="contractorView" class="view contractor-view active">
+            <h2 id="contractorTitle">Contractor Payment Details | ठेकेदार भुगतान विवरण</h2>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <h3 id="contractorTotalLabel">Total Paid | कुल भुगतान</h3>
+                    <div class="value" id="contractorTotalPaid">₹0</div>
+                </div>
+            </div>
+            <table class="expense-table">
+                <thead>
+                    <tr>
+                        <th id="thDate">Date | तारीख</th>
+                        <th id="thAmount">Amount | राशि</th>
+                        <th id="thMode">Payment Mode | भुगतान तरीका</th>
+                        <th id="thProof">Proof | प्रमाण</th>
+                    </tr>
+                </thead>
+                <tbody id="contractorPaymentsList"></tbody>
+            </table>
+            <div style="margin-top: 30px; text-align: center;">
+                <button class="btn-primary" onclick="showOwnerLogin()" id="btnOwnerAccess">Owner Access | मालिक पहुंच</button>
+            </div>
+        </div>
+
+        <div id="ownerLoginView" class="view">
+            <div class="owner-lock">
+                <h2 id="ownerLoginTitle">Owner Login | मालिक लॉगिन</h2>
+                <p id="ownerLoginText">Enter password to access full dashboard | पूर्ण डैशबोर्ड देखने के लिए पासवर्ड दर्ज करें</p>
+                <input type="password" id="ownerPassword" placeholder="Password" />
+                <button class="btn-primary" onclick="verifyOwner()">Unlock | अनलॉक करें</button>
+                <div id="ownerError" style="color: red; margin-top: 15px;"></div>
+            </div>
+        </div>
+
+        <div id="ownerNav" class="nav hidden">
+            <button class="nav-btn active" onclick="switchView('dashboard')" id="navDashboard">Dashboard</button>
+            <button class="nav-btn" onclick="switchView('addExpense')" id="navAddExpense">Add Expense</button>
+            <button class="nav-btn" onclick="switchView('history')" id="navHistory">History</button>
+        </div>
+
+        <div id="dashboardView" class="view">
+            <h2 id="dashTitle">Dashboard | डैशबोर्ड</h2>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <h3 id="kpiTotalBudget">Total Budget | कुल बजट</h3>
+                    <div class="value" id="totalBudget">₹0</div>
+                </div>
+                <div class="kpi-card">
+                    <h3 id="kpiTotalSpent">Total Spent | कुल खर्च</h3>
+                    <div class="value" id="totalSpent">₹0</div>
+                </div>
+                <div class="kpi-card">
+                    <h3 id="kpiContractorPaid">Contractor Paid | ठेकेदार भुगतान</h3>
+                    <div class="value" id="contractorSpent">₹0</div>
+                </div>
+                <div class="kpi-card">
+                    <h3 id="kpiMaterialSpent">Material Spent | सामग्री खर्च</h3>
+                    <div class="value" id="materialSpent">₹0</div>
+                </div>
+            </div>
+            <h3 id="recentExpensesTitle">Recent Expenses | हाल के खर्च</h3>
+            <table class="expense-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="recentExpensesList"></tbody>
+            </table>
+        </div>
+
+        <div id="addExpenseView" class="view">
+            <h2 id="addExpenseTitle">Add New Expense | नया खर्च जोड़ें</h2>
+            <form id="expenseForm">
+                <div class="form-group">
+                    <label id="labelDate">Date | तारीख</label>
+                    <input type="date" id="expenseDate" required />
+                </div>
+                <div class="form-group">
+                    <label id="labelCategory">Category | श्रेणी</label>
+                    <select id="expenseCategory" required>
+                        <option value="Contractor">Contractor | ठेकेदार</option>
+                        <option value="Material">Material | सामग्री</option>
+                        <option value="Equipment">Equipment | उपकरण</option>
+                        <option value="Miscellaneous">Miscellaneous | विविध</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label id="labelDescription">Description | विवरण</label>
+                    <textarea id="expenseDescription" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label id="labelAmount">Amount (₹) | राशि</label>
+                    <input type="number" id="expenseAmount" required />
+                </div>
+                <div class="form-group">
+                    <label id="labelPaymentMode">Payment Mode | भुगतान तरीका</label>
+                    <select id="expensePaymentMode" required>
+                        <option value="Cash">Cash | नकद</option>
+                        <option value="UPI">UPI</option>
+                        <option value="Bank Transfer">Bank Transfer | बैंक स्थानांतरण</option>
+                        <option value="Cheque">Cheque | चेक</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label id="labelPaidTo">Paid To | किसे भुगतान</label>
+                    <input type="text" id="expensePaidTo" required />
+                </div>
+                <div class="form-group">
+                    <label id="labelScreenshot">Payment Screenshot | भुगतान स्क्रीनशॉट</label>
+                    <input type="file" id="expenseScreenshot" accept="image/*" />
+                    <img id="screenshotPreview" class="image-preview hidden" />
+                </div>
+                <button type="submit" class="btn-primary" id="btnSubmit">Save Expense | खर्च सहेजें</button>
+            </form>
+        </div>
+
+        <div id="historyView" class="view">
+            <h2 id="historyTitle">Expense History | खर्चों का इतिहास</h2>
+            <div id="historyList" style="margin-top: 20px;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycbw8ncxeylOyHRSAFQXZBdZh3sYIdhTzoO1a7O6Vrc01nzC-j9a9ojkKEjHp_XB0f1c/exec';
+        let currentLang = 'en';
+        let ownerSecret = '';
+
+        const translations = {
+            en: {
+                mainTitle: 'House Construction Tracker',
+                contractorTitle: 'Contractor Payment Details',
+                contractorTotalLabel: 'Total Paid',
+                thDate: 'Date', thAmount: 'Amount', thMode: 'Payment Mode', thProof: 'Proof',
+                btnOwnerAccess: 'Owner Access',
+                ownerLoginTitle: 'Owner Login',
+                ownerLoginText: 'Enter password to access full dashboard',
+                dashTitle: 'Dashboard',
+                kpiTotalBudget: 'Total Budget', kpiTotalSpent: 'Total Spent',
+                kpiContractorPaid: 'Contractor Paid', kpiMaterialSpent: 'Material Spent',
+                recentExpensesTitle: 'Recent Expenses',
+                navDashboard: 'Dashboard', navAddExpense: 'Add Expense', navHistory: 'History',
+                addExpenseTitle: 'Add New Expense', labelDate: 'Date', labelCategory: 'Category',
+                labelDescription: 'Description', labelAmount: 'Amount (₹)',
+                labelPaymentMode: 'Payment Mode', labelPaidTo: 'Paid To',
+                labelScreenshot: 'Payment Screenshot', btnSubmit: 'Save Expense',
+                historyTitle: 'Expense History'
+            },
+            hi: {
+                mainTitle: 'घर निर्माण ट्रैकर',
+                contractorTitle: 'ठेकेदार भुगतान विवरण',
+                contractorTotalLabel: 'कुल भुगतान',
+                thDate: 'तारीख', thAmount: 'राशि', thMode: 'भुगतान तरीका', thProof: 'प्रमाण',
+                btnOwnerAccess: 'मालिक पहुंच',
+                ownerLoginTitle: 'मालिक लॉगिन',
+                ownerLoginText: 'पूर्ण डैशबोर्ड देखने के लिए पासवर्ड दर्ज करें',
+                dashTitle: 'डैशबोर्ड',
+                kpiTotalBudget: 'कुल बजट', kpiTotalSpent: 'कुल खर्च',
+                kpiContractorPaid: 'ठेकेदार भुगतान', kpiMaterialSpent: 'सामग्री खर्च',
+                recentExpensesTitle: 'हाल के खर्च',
+                navDashboard: 'डैशबोर्ड', navAddExpense: 'खर्च जोड़ें', navHistory: 'इतिहास',
+                addExpenseTitle: 'नया खर्च जोड़ें', labelDate: 'तारीख', labelCategory: 'श्रेणी',
+                labelDescription: 'विवरण', labelAmount: 'राशि (₹)',
+                labelPaymentMode: 'भुगतान तरीका', labelPaidTo: 'किसे भुगतान',
+                labelScreenshot: 'भुगतान स्क्रीनशॉट', btnSubmit: 'खर्च सहेजें',
+                historyTitle: 'खर्चों का इतिहास'
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'hi' : 'en';
+            updateUI();
+        }
+
+        function updateUI() {
+            const t = translations[currentLang];
+            for (let id in t) {
+                const el = document.getElementById(id);
+                if (el) el.innerText = t[id];
+            }
+        }
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId + 'View').classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('nav' + viewId.charAt(0).toUpperCase() + viewId.slice(1)).classList.add('active');
+            if (viewId === 'dashboard') loadDashboard();
+            if (viewId === 'history') loadHistory();
+        }
+
+        function showOwnerLogin() {
+            document.getElementById('contractorView').classList.remove('active');
+            document.getElementById('ownerLoginView').classList.add('active');
+        }
+
+        async function verifyOwner() {
+            const pass = document.getElementById('ownerPassword').value;
+            // Simplified verify: try fetching summary with this secret
+            try {
+                const res = await fetch(`${API_URL}?action=getSummary&secret=${pass}`);
+                const data = await res.json();
+                if (data.error) throw new Error('Unauthorized');
+                ownerSecret = pass;
+                document.getElementById('ownerLoginView').classList.remove('active');
+                document.getElementById('ownerNav').classList.remove('hidden');
+                switchView('dashboard');
+            } catch (err) {
+                document.getElementById('ownerError').innerText = 'Invalid Password! | गलत पासवर्ड!';
+            }
+        }
+
+        async function loadContractorPayments() {
+            const res = await fetch(`${API_URL}?action=getContractorPayments`);
+            const data = await res.json();
+            const list = document.getElementById('contractorPaymentsList');
+            list.innerHTML = '';
+            data.payments.forEach(p => {
+                const row = `<tr>
+                    <td>${p.Date}</td>
+                    <td>₹${p.Amount}</td>
+                    <td>${p.Payment_Mode}</td>
+                    <td>${p.Screenshot_URL ? `<a href="${p.Screenshot_URL}" target="_blank">View</a>` : '-'}</td>
+                </tr>`;
+                list.innerHTML += row;
+            });
+            document.getElementById('contractorTotalPaid').innerText = `₹${data.total}`;
+        }
+
+        async function loadDashboard() {
+            const res = await fetch(`${API_URL}?action=getSummary&secret=${ownerSecret}`);
+            const data = await res.json();
+            document.getElementById('totalBudget').innerText = `₹${data.totalBudget}`;
+            document.getElementById('totalSpent').innerText = `₹${data.summary.total}`;
+            document.getElementById('contractorSpent').innerText = `₹${data.summary.Contractor}`;
+            document.getElementById('materialSpent').innerText = `₹${data.summary.Material}`;
+            
+            const list = document.getElementById('recentExpensesList');
+            list.innerHTML = '';
+            data.recentExpenses.forEach(p => {
+                const row = `<tr>
+                    <td>${p.Date}</td>
+                    <td>${p.Category}</td>
+                    <td>${p.Description}</td>
+                    <td>₹${p.Amount}</td>
+                </tr>`;
+                list.innerHTML += row;
+            });
+        }
+
+        async function loadHistory() {
+            const res = await fetch(`${API_URL}?action=getExpenses&secret=${ownerSecret}`);
+            const data = await res.json();
+            const list = document.getElementById('historyList');
+            list.innerHTML = '';
+            data.expenses.reverse().forEach(p => {
+                const item = `<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 8px;">
+                    <strong>${p.Date} - ${p.Category}</strong><br>
+                    <span>${p.Description}</span><br>
+                    <span style="color: #d2691e; font-weight: bold;">₹${p.Amount} (${p.Payment_Mode})</span><br>
+                    <span>To: ${p.Paid_To}</span>
+                    ${p.Screenshot_URL ? `<br><a href="${p.Screenshot_URL}" target="_blank">Proof</a>` : ''}
+                </div>`;
+                list.innerHTML += item;
+            });
+        }
+
+        document.getElementById('expenseScreenshot').onchange = function(e) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const preview = document.getElementById('screenshotPreview');
+                preview.src = reader.result;
+                preview.classList.remove('hidden');
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        };
+
+        document.getElementById('expenseForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmit');
+            btn.innerText = 'Saving... | सहेज रहा है...';
+            btn.disabled = true;
+
+            let screenshotUrl = '';
+            const file = document.getElementById('expenseScreenshot').files[0];
+            if (file) {
+                const base64 = document.getElementById('screenshotPreview').src.split(',')[1];
+                const resImg = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'uploadImage',
+                        secret: ownerSecret,
+                        imageData: base64,
+                        mimeType: file.type,
+                        fileName: file.name
+                    })
+                });
+                const dataImg = await resImg.json();
+                if (dataImg.success) screenshotUrl = dataImg.url;
+            }
+
+            const expense = {
+                action: 'addExpense',
+                secret: ownerSecret,
+                date: document.getElementById('expenseDate').value,
+                category: document.getElementById('expenseCategory').value,
+                description: document.getElementById('expenseDescription').value,
+                amount: document.getElementById('expenseAmount').value,
+                paymentMode: document.getElementById('expensePaymentMode').value,
+                paidTo: document.getElementById('expensePaidTo').value,
+                screenshotUrl: screenshotUrl
+            };
+
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify(expense)
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert('Saved! | सहेजा गया!');
+                document.getElementById('expenseForm').reset();
+                document.getElementById('screenshotPreview').classList.add('hidden');
+                switchView('dashboard');
+            }
+            btn.innerText = translations[currentLang].btnSubmit;
+            btn.disabled = false;
+        };
+
+        // Initialize
+        loadContractorPayments();
+        updateUI();
+    </script>
+</body>
+</html>
