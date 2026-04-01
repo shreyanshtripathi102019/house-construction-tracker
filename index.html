@@ -641,7 +641,7 @@
                     </div>
 
                     <p class="footer-note">
-                        Important: replace <code>__APPS_SCRIPT_WEB_APP_URL__</code> in this file after you deploy the Apps Script web app.
+                        Important: replace <code>https://script.google.com/macros/s/AKfycbzxyl6V3Lz2rgqEdt68yBBc2bDaT2B2EzOxrUQ08rFB5UbV15G8pgpSxCZWK2EU_IGp/exec</code> in this file after you deploy the Apps Script web app.
                         If you skip that step, login and contractor data will not work.
                     </p>
                 </section>
@@ -651,7 +651,7 @@
 
     <script>
         const CONFIG = {
-            API_URL: "__APPS_SCRIPT_WEB_APP_URL__",
+            API_URL: "https://script.google.com/macros/s/AKfycbzxyl6V3Lz2rgqEdt68yBBc2bDaT2B2EzOxrUQ08rFB5UbV15G8pgpSxCZWK2EU_IGp/exec",
             PUBLIC_TOKEN: "PUBLIC"
         };
 
@@ -694,8 +694,8 @@
         }
 
         function ensureApiConfigured() {
-            if (!CONFIG.API_URL || CONFIG.API_URL.includes("__APPS_SCRIPT_WEB_APP_URL__")) {
-                throw new Error("API_URL is not configured yet. Replace __APPS_SCRIPT_WEB_APP_URL__ in index.html with the deployed Apps Script /exec URL.");
+            if (!CONFIG.API_URL || CONFIG.API_URL.includes("https://script.google.com/macros/s/AKfycbzxyl6V3Lz2rgqEdt68yBBc2bDaT2B2EzOxrUQ08rFB5UbV15G8pgpSxCZWK2EU_IGp/exec")) {
+                throw new Error("API_URL is not configured yet. Replace https://script.google.com/macros/s/AKfycbzxyl6V3Lz2rgqEdt68yBBc2bDaT2B2EzOxrUQ08rFB5UbV15G8pgpSxCZWK2EU_IGp/exec in index.html with the deployed Apps Script /exec URL.");
             }
         }
 
