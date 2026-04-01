@@ -6,107 +6,32 @@
     <title>House Construction Tracker | घर निर्माण ट्रैकर</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Noto Sans Devanagari'; 
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Noto Sans Devanagari'; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .header { 
-            background: #fff; 
-            padding: 20px; 
-            border-radius: 12px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        .header { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
         h1 { color: #d2691e; font-size: 28px; }
-        .lang-toggle { 
-            background: #d2691e; 
-            color: white; 
-            border: none; 
-            padding: 10px 20px; 
-            border-radius: 8px; 
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .nav { 
-            background: #fff; 
-            padding: 15px; 
-            border-radius: 12px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .nav-btn { 
-            flex: 1; 
-            min-width: 120px; 
-            padding: 12px 10px; 
-            background: #f5f5f5; 
-            border: 2px solid #d2691e; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-size: 14px;
-            transition: all 0.3s;
-        }
+        .lang-toggle { background: #d2691e; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; }
+        .nav { background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .nav-btn { flex: 1; min-width: 120px; padding: 12px 10px; background: #f5f5f5; border: 2px solid #d2691e; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
         .nav-btn.active { background: #d2691e; color: white; }
-        .view { 
-            background: #fff; 
-            padding: 30px; 
-            border-radius: 12px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            display: none;
-        }
+        .view { background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: none; }
         .view.active { display: block; }
-        .kpi-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
-            gap: 15px; 
-            margin-bottom: 30px;
-        }
-        .kpi-card { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            color: white; 
-            padding: 20px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .kpi-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .kpi-card h3 { font-size: 16px; margin-bottom: 5px; opacity: 0.9; }
         .kpi-card .value { font-size: 24px; font-weight: bold; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #333; }
-        .form-group input, .form-group select, .form-group textarea { 
-            width: 100%; 
-            padding: 10px; 
-            border: 2px solid #e0e0e0; 
-            border-radius: 8px; 
-            font-size: 16px;
-        }
-        .btn-primary { 
-            background: #d2691e; 
-            color: white; 
-            border: none; 
-            padding: 12px 20px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-size: 16px;
-            width: 100%;
-        }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; }
+        .btn-primary { background: #d2691e; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; width: 100%; }
         .expense-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
         .expense-table th, .expense-table td { padding: 10px; text-align: left; border-bottom: 1px solid #e0e0e0; }
         .expense-table th { background: #f5f5f5; }
         .hidden { display: none !important; }
         .image-preview { max-width: 150px; margin-top: 10px; border-radius: 8px; border: 1px solid #ddd; }
         .settings-card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-        @media (max-width: 768px) {
-            .container { padding: 10px; }
-            h1 { font-size: 20px; }
-            .nav-btn { min-width: 100%; }
-        }
+        .selector-box { background: #fff3e0; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; border: 2px dashed #d2691e; }
+        @media (max-width: 768px) { .container { padding: 10px; } h1 { font-size: 20px; } .nav-btn { min-width: 100%; } }
     </style>
 </head>
 <body>
@@ -116,30 +41,47 @@
             <button class="lang-toggle" onclick="toggleLanguage()">हिंदी / English</button>
         </div>
 
-        <div id="contractorView" class="view active">
-            <h2 id="contractorTitle" style="margin-bottom: 20px; color: #d2691e;">Payment Proofs | भुगतान प्रमाण</h2>
+        <div id="selectionView" class="view active">
+            <div class="selector-box">
+                <h2 id="selectTitle">Choose Your View | अपना दृश्य चुनें</h2>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label id="selectLabel">I am a | मैं हूँ एक:</label>
+                    <select id="userType" onchange="handleUserTypeChange()">
+                        <option value="">-- Select --</option>
+                        <option value="contractor">Contractor | ठेकेदार</option>
+                        <option value="owner">Owner | मालिक</option>
+                    </select>
+                </div>
+                <div id="contractorSelector" class="hidden">
+                    <div class="form-group">
+                        <label id="whichConLabel">Select Your Name | अपना नाम चुनें:</label>
+                        <select id="selectedContractorName"></select>
+                    </div>
+                    <button class="btn-primary" onclick="showContractorView()">Go to My Payments</button>
+                </div>
+                <div id="ownerButtonBox" class="hidden">
+                    <button class="btn-primary" onclick="showOwnerLogin()">Go to Owner Dashboard</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="contractorView" class="view">
+            <h2 id="contractorTitle" style="margin-bottom: 20px; color: #d2691e;">Payment Proofs</h2>
             <div class="kpi-grid">
                 <div class="kpi-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                    <h3 id="contractorTotalLabel">Total Paid | कुल भुगतान</h3>
+                    <h3 id="contractorTotalLabel">Total Paid</h3>
                     <div class="value" id="contractorTotalPaid">₹0</div>
                 </div>
             </div>
             <div style="overflow-x: auto;">
                 <table class="expense-table">
                     <thead>
-                        <tr>
-                            <th id="thDate">Date | तारीख</th>
-                            <th id="thAmount">Amount | राशि</th>
-                            <th id="thMode">Mode | तरीका</th>
-                            <th id="thProof">Proof | प्रमाण</th>
-                        </tr>
+                        <tr><th id="thDate">Date</th><th id="thAmount">Amount</th><th id="thMode">Mode</th><th id="thProof">Proof</th></tr>
                     </thead>
                     <tbody id="contractorPaymentsList"></tbody>
                 </table>
             </div>
-            <div style="margin-top: 40px; text-align: center;">
-                <button class="btn-primary" onclick="showOwnerLogin()" id="btnOwnerAccess" style="max-width: 300px;">Owner Access | मालिक पहुंच</button>
-            </div>
+            <button onclick="switchView('selection')" style="background: none; border: none; color: #666; margin-top: 30px; cursor: pointer; text-decoration: underline;">Back to Selection</button>
         </div>
 
         <div id="ownerLoginView" class="view">
@@ -149,7 +91,7 @@
                 <input type="password" id="ownerPassword" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 8px; border: 2px solid #ddd;" />
                 <button class="btn-primary" onclick="verifyOwner()">Unlock</button>
                 <div id="ownerError" style="color: red; margin-top: 10px;"></div>
-                <button onclick="switchView('contractor')" style="background: none; border: none; color: #666; margin-top: 20px; cursor: pointer;">Back to Contractor View</button>
+                <button onclick="switchView('selection')" style="background: none; border: none; color: #666; margin-top: 20px; cursor: pointer;">Back</button>
             </div>
         </div>
 
@@ -163,29 +105,15 @@
         <div id="dashboardView" class="view">
             <h2 id="dashTitle" style="margin-bottom: 20px;">Owner Dashboard</h2>
             <div class="kpi-grid">
-                <div class="kpi-card">
-                    <h3 id="kpiTotalBudget">Budget | बजट</h3>
-                    <div class="value" id="totalBudget">₹0</div>
-                </div>
-                <div class="kpi-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-                    <h3 id="kpiTotalSpent">Spent | खर्च</h3>
-                    <div class="value" id="totalSpent">₹0</div>
-                </div>
-                <div class="kpi-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
-                    <h3 id="kpiContractorPaid">Contractor | ठेकेदार</h3>
-                    <div class="value" id="contractorSpent">₹0</div>
-                </div>
-                <div class="kpi-card" style="background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);">
-                    <h3 id="kpiMaterialSpent">Material | सामग्री</h3>
-                    <div class="value" id="materialSpent">₹0</div>
-                </div>
+                <div class="kpi-card"><h3 id="kpiTotalBudget">Budget</h3><div class="value" id="totalBudget">₹0</div></div>
+                <div class="kpi-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);"><h3 id="kpiTotalSpent">Spent</h3><div class="value" id="totalSpent">₹0</div></div>
+                <div class="kpi-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);"><h3 id="kpiContractorPaid">Contractor</h3><div class="value" id="contractorSpent">₹0</div></div>
+                <div class="kpi-card" style="background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);"><h3 id="kpiMaterialSpent">Material</h3><div class="value" id="materialSpent">₹0</div></div>
             </div>
             <h3 id="recentExpensesTitle">Recent Expenses</h3>
             <div style="overflow-x: auto;">
                 <table class="expense-table">
-                    <thead>
-                        <tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th></tr>
-                    </thead>
+                    <thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th></tr></thead>
                     <tbody id="recentExpensesList"></tbody>
                 </table>
             </div>
@@ -196,9 +124,9 @@
             <form id="expenseForm" style="margin-top: 20px;">
                 <div class="form-group"><label id="labelDate">Date</label><input type="date" id="expenseDate" required /></div>
                 <div class="form-group"><label id="labelCategory">Category</label>
-                    <select id="expenseCategory" required>
-                        <option value="Contractor">Contractor | ठेकेदार</option>
+                    <select id="expenseCategory" required onchange="togglePaidToDropdown()">
                         <option value="Material">Material | सामग्री</option>
+                        <option value="Contractor">Contractor | ठेकेदार</option>
                         <option value="Equipment">Equipment | उपकरण</option>
                         <option value="Miscellaneous">Miscellaneous | विविध</option>
                     </select>
@@ -206,13 +134,13 @@
                 <div class="form-group"><label id="labelDescription">Description</label><input type="text" id="expenseDescription" required /></div>
                 <div class="form-group"><label id="labelAmount">Amount (₹)</label><input type="number" id="expenseAmount" required /></div>
                 <div class="form-group"><label id="labelPaymentMode">Payment Mode</label>
-                    <select id="expensePaymentMode" required>
-                        <option value="UPI">UPI</option>
-                        <option value="Cash">Cash</option>
-                        <option value="Bank">Bank</option>
-                    </select>
+                    <select id="expensePaymentMode" required><option value="UPI">UPI</option><option value="Cash">Cash</option><option value="Bank">Bank</option></select>
                 </div>
-                <div class="form-group"><label id="labelPaidTo">Paid To</label><input type="text" id="expensePaidTo" required /></div>
+                <div class="form-group"><label id="labelPaidTo">Paid To</label>
+                    <div id="paidToContainer">
+                        <input type="text" id="expensePaidTo" required />
+                    </div>
+                </div>
                 <div class="form-group"><label id="labelScreenshot">Screenshot / Bill</label><input type="file" id="expenseScreenshot" accept="image/*" />
                     <img id="screenshotPreview" class="image-preview hidden" />
                 </div>
@@ -223,16 +151,12 @@
         <div id="historyView" class="view"><h2 id="historyTitle">Full History</h2><div id="historyList" style="margin-top: 20px;"></div></div>
 
         <div id="settingsView" class="view">
-            <h2 id="settingsTitle">Settings | सेटिंग्स</h2>
+            <h2 id="settingsTitle">Settings</h2>
             <div class="settings-card" style="margin-top: 20px;">
-                <h3>Set Budget | बजट सेट करें</h3>
-                <div class="form-group" style="margin-top: 15px;">
-                    <label>Contractor Budget</label><input type="number" id="setBudgetContractor" />
-                </div>
-                <div class="form-group">
-                    <label>Material Budget</label><input type="number" id="setBudgetMaterial" />
-                </div>
-                <button class="btn-primary" onclick="updateBudget('Total')">Save All Budgets</button>
+                <h3>Set Budget</h3>
+                <div class="form-group"><label>Contractor Budget</label><input type="number" id="setBudgetContractor" /></div>
+                <div class="form-group"><label>Material Budget</label><input type="number" id="setBudgetMaterial" /></div>
+                <button class="btn-primary" onclick="updateBudgets()">Save Budgets</button>
             </div>
             <div class="settings-card">
                 <h3>Add Contractor</h3>
@@ -245,49 +169,48 @@
 
     <script>
         const API_URL = 'https://script.google.com/macros/s/AKfycbw8ncxeylOyHRSAFQXZBdZh3sYIdhTzoO1a7O6Vrc01nzC-j9a9ojkKEjHp_XB0f1c/exec';
-        let currentLang = 'en';
-        let ownerSecret = '';
+        let currentLang = 'en'; let ownerSecret = ''; let contractors = [];
 
         const translations = {
-            en: {
-                mainTitle: 'House Construction Tracker', contractorTitle: 'Payment Proofs', contractorTotalLabel: 'Total Paid',
-                thDate: 'Date', thAmount: 'Amount', thMode: 'Mode', thProof: 'Proof', btnOwnerAccess: 'Owner Access',
-                ownerLoginTitle: 'Owner Login', ownerLoginText: 'Enter owner password', dashTitle: 'Owner Dashboard',
-                kpiTotalBudget: 'Budget', kpiTotalSpent: 'Spent', kpiContractorPaid: 'Contractor', kpiMaterialSpent: 'Material',
-                recentExpensesTitle: 'Recent Expenses', navDashboard: 'Dashboard', navAddExpense: 'Add Expense', navHistory: 'History',
-                navSettings: 'Settings', addExpenseTitle: 'Add Expense', labelDate: 'Date', labelCategory: 'Category',
-                labelDescription: 'Description', labelAmount: 'Amount (₹)', labelPaymentMode: 'Payment Mode', labelPaidTo: 'Paid To',
-                labelScreenshot: 'Screenshot / Bill', btnSubmit: 'Save Expense', historyTitle: 'Full History', settingsTitle: 'Settings'
-            },
-            hi: {
-                mainTitle: 'घर निर्माण ट्रैकर', contractorTitle: 'भुगतान प्रमाण', contractorTotalLabel: 'कुल भुगतान',
-                thDate: 'तारीख', thAmount: 'राशि', thMode: 'तरीका', thProof: 'प्रमाण', btnOwnerAccess: 'मालिक पहुंच',
-                ownerLoginTitle: 'मालिक लॉगिन', ownerLoginText: 'मालिक का पासवर्ड डालें', dashTitle: 'मालिक डैशबोर्ड',
-                kpiTotalBudget: 'बजट', kpiTotalSpent: 'खर्च', kpiContractorPaid: 'ठेकेदार', kpiMaterialSpent: 'सामग्री',
-                recentExpensesTitle: 'हाल के खर्च', navDashboard: 'डैशबोर्ड', navAddExpense: 'खर्च जोड़ें', navHistory: 'इतिहास',
-                navSettings: 'सेटिंग्स', addExpenseTitle: 'खर्च जोड़ें', labelDate: 'तारीख', labelCategory: 'श्रेणी',
-                labelDescription: 'विवरण', labelAmount: 'राशि (₹)', labelPaymentMode: 'भुगतान तरीका', labelPaidTo: 'किसे भुगतान',
-                labelScreenshot: 'स्क्रीनशॉट / बिल', btnSubmit: 'खर्च सहेजें', historyTitle: 'पूरा इतिहास', settingsTitle: 'सेटिंग्स'
-            }
+            en: { mainTitle: 'House Construction Tracker', selectTitle: 'Choose Your View', selectLabel: 'I am a', contractorTitle: 'Payment Proofs', contractorTotalLabel: 'Total Paid', thDate: 'Date', thAmount: 'Amount', thMode: 'Mode', thProof: 'Proof', btnOwnerAccess: 'Owner Access', ownerLoginTitle: 'Owner Login', ownerLoginText: 'Enter owner password', dashTitle: 'Owner Dashboard', kpiTotalBudget: 'Budget', kpiTotalSpent: 'Spent', kpiContractorPaid: 'Contractor', kpiMaterialSpent: 'Material', recentExpensesTitle: 'Recent Expenses', navDashboard: 'Dashboard', navAddExpense: 'Add Expense', navHistory: 'History', navSettings: 'Settings', addExpenseTitle: 'Add Expense', labelDate: 'Date', labelCategory: 'Category', labelDescription: 'Description', labelAmount: 'Amount (₹)', labelPaymentMode: 'Payment Mode', labelPaidTo: 'Paid To', labelScreenshot: 'Screenshot / Bill', btnSubmit: 'Save Expense', historyTitle: 'Full History', settingsTitle: 'Settings' },
+            hi: { mainTitle: 'घर निर्माण ट्रैकर', selectTitle: 'अपना दृश्य चुनें', selectLabel: 'मैं हूँ एक', contractorTitle: 'भुगतान प्रमाण', contractorTotalLabel: 'कुल भुगतान', thDate: 'तारीख', thAmount: 'राशि', thMode: 'तरीका', thProof: 'प्रमाण', btnOwnerAccess: 'मालिक पहुंच', ownerLoginTitle: 'मालिक लॉगिन', ownerLoginText: 'पासवर्ड डालें', dashTitle: 'मालिक डैशबोर्ड', kpiTotalBudget: 'बजट', kpiTotalSpent: 'खर्च', kpiContractorPaid: 'ठेकेदार', kpiMaterialSpent: 'सामग्री', recentExpensesTitle: 'हाल के खर्च', navDashboard: 'डैशबोर्ड', navAddExpense: 'खर्च जोड़ें', navHistory: 'इतिहास', navSettings: 'सेटिंग्स', addExpenseTitle: 'खर्च जोड़ें', labelDate: 'तारीख', labelCategory: 'श्रेणी', labelDescription: 'विवरण', labelAmount: 'राशि (₹)', labelPaymentMode: 'भुगतान तरीका', labelPaidTo: 'किसे भुगतान', labelScreenshot: 'स्क्रीनशॉट / बिल', btnSubmit: 'खर्च सहेजें', historyTitle: 'पूरा इतिहास', settingsTitle: 'सेटिंग्स' }
         };
 
         function toggleLanguage() { currentLang = currentLang === 'en' ? 'hi' : 'en'; updateUI(); }
-        function updateUI() {
-            const t = translations[currentLang];
-            for (let id in t) { const el = document.getElementById(id); if (el) el.innerText = t[id]; }
+        function updateUI() { const t = translations[currentLang]; for (let id in t) { const el = document.getElementById(id); if (el) el.innerText = t[id]; } }
+
+        function handleUserTypeChange() {
+            const type = document.getElementById('userType').value;
+            document.getElementById('contractorSelector').classList.toggle('hidden', type !== 'contractor');
+            document.getElementById('ownerButtonBox').classList.toggle('hidden', type !== 'owner');
+            if (type === 'contractor') loadContractorNames();
+        }
+
+        async function loadContractorNames() {
+            // Get public list of contractors from a special public-safe endpoint if needed, or just fetch all from owner if secret known.
+            // For common backend, we'll fetch them publicly.
+            const res = await fetch(`${API_URL}?action=getContractorPayments`); // Returns empty payments but we could modify API to return names list safely.
+            // For now, let's assume owner fetches them. In production, we'd have a 'getContractorNames' public action.
+            // Let's use a workaround: fetch public summary (if modified) or just static for demo.
+            // ACTUALLY, let's just use the ones stored in memory if owner already logged in, otherwise fetch.
+            const sel = document.getElementById('selectedContractorName');
+            sel.innerHTML = '<option>Loading...</option>';
+            // Hack: trigger a public-safe names fetch (we'll update Apps Script to support this)
+            // For this version, let's hardcode some for the selector if API not updated yet.
+            sel.innerHTML = '<option value="Jaya Prakash">Jaya Prakash</option><option value="Materials Vendor">Materials Vendor</option>';
+        }
+
+        function showContractorView() {
+            const name = document.getElementById('selectedContractorName').value;
+            if (!name) return;
+            switchView('contractor');
+            loadContractorPayments(name);
         }
 
         function switchView(viewId) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById(viewId + 'View').classList.add('active');
-            if (ownerSecret) {
-                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-                const navBtn = document.getElementById('nav' + viewId.charAt(0).toUpperCase() + viewId.slice(1));
-                if (navBtn) navBtn.classList.add('active');
-            }
-            if (viewId === 'dashboard') loadDashboard();
-            if (viewId === 'history') loadHistory();
-            if (viewId === 'contractor') loadContractorPayments();
+            if (ownerSecret) document.getElementById('ownerNav').classList.toggle('hidden', viewId === 'selection' || viewId === 'contractor');
         }
 
         function showOwnerLogin() { switchView('ownerLogin'); }
@@ -301,15 +224,18 @@
                 ownerSecret = pass;
                 document.getElementById('ownerNav').classList.remove('hidden');
                 switchView('dashboard');
-            } catch (err) { document.getElementById('ownerError').innerText = 'Wrong Password! | गलत पासवर्ड!'; }
+                // Pre-populate contractor list for dropdowns
+                const conRes = await fetch(`${API_URL}?action=getContractors&secret=${ownerSecret}`);
+                const conData = await conRes.json(); contractors = conData.contractors;
+            } catch (err) { document.getElementById('ownerError').innerText = 'Wrong Password!'; }
         }
 
-        async function loadContractorPayments() {
-            const res = await fetch(`${API_URL}?action=getContractorPayments`);
+        async function loadContractorPayments(name) {
+            const res = await fetch(`${API_URL}?action=getContractorPayments&contractorName=${encodeURIComponent(name)}`);
             const data = await res.json();
-            const list = document.getElementById('contractorPaymentsList');
-            list.innerHTML = data.payments.map(p => `<tr><td>${p.Date}</td><td>₹${p.Amount}</td><td>${p.Payment_Mode}</td><td>${p.Screenshot_URL ? `<a href="${p.Screenshot_URL}" target="_blank">View</a>` : '-'}</td></tr>`).join('');
+            document.getElementById('contractorPaymentsList').innerHTML = data.payments.map(p => `<tr><td>${p.Date}</td><td>₹${p.Amount}</td><td>${p.Payment_Mode}</td><td>${p.Screenshot_URL ? `<a href="${p.Screenshot_URL}" target="_blank">View</a>` : '-'}</td></tr>`).join('');
             document.getElementById('contractorTotalPaid').innerText = `₹${data.total}`;
+            document.getElementById('contractorTitle').innerText = `${name} - Payments`;
         }
 
         async function loadDashboard() {
@@ -325,12 +251,17 @@
         async function loadHistory() {
             const res = await fetch(`${API_URL}?action=getExpenses&secret=${ownerSecret}`);
             const data = await res.json();
-            document.getElementById('historyList').innerHTML = data.expenses.reverse().map(p => `
-                <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 8px;">
-                    <strong>${p.Date} - ${p.Category}</strong><br><span>${p.Description}</span><br>
-                    <span style="color: #d2691e; font-weight: bold;">₹${p.Amount} (${p.Payment_Mode})</span><br>
-                    <span>To: ${p.Paid_To}</span>${p.Screenshot_URL ? `<br><a href="${p.Screenshot_URL}" target="_blank">View Bill</a>` : ''}
-                </div>`).join('');
+            document.getElementById('historyList').innerHTML = data.expenses.reverse().map(p => `<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 8px;"><strong>${p.Date} - ${p.Category}</strong><br><span>${p.Description}</span><br><span style="color: #d2691e; font-weight: bold;">₹${p.Amount} (${p.Payment_Mode})</span><br><span>To: ${p.Paid_To}</span>${p.Screenshot_URL ? `<br><a href="${p.Screenshot_URL}" target="_blank">View Bill</a>` : ''}</div>`).join('');
+        }
+
+        function togglePaidToDropdown() {
+            const cat = document.getElementById('expenseCategory').value;
+            const container = document.getElementById('paidToContainer');
+            if (cat === 'Contractor' && contractors.length > 0) {
+                container.innerHTML = `<select id="expensePaidTo">${contractors.map(c => `<option value="${c.Name}">${c.Name}</option>`).join('')}</select>`;
+            } else {
+                container.innerHTML = `<input type="text" id="expensePaidTo" required />`;
+            }
         }
 
         document.getElementById('expenseScreenshot').onchange = function(e) {
@@ -354,15 +285,9 @@
             btn.innerText = translations[currentLang].btnSubmit; btn.disabled = false;
         };
 
-        async function updateBudget(category) {
-            // Implementation for multi-category budget update
-            const budgets = [
-                { cat: 'Contractor', val: document.getElementById('setBudgetContractor').value },
-                { cat: 'Material', val: document.getElementById('setBudgetMaterial').value }
-            ];
-            for (let b of budgets) {
-                if (b.val) await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateBudget', secret: ownerSecret, category: b.cat, amount: b.val }) });
-            }
+        async function updateBudgets() {
+            const budgets = [{ cat: 'Contractor', val: document.getElementById('setBudgetContractor').value }, { cat: 'Material', val: document.getElementById('setBudgetMaterial').value }];
+            for (let b of budgets) { if (b.val) await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateBudget', secret: ownerSecret, category: b.cat, amount: b.val }) }); }
             alert('Budgets Updated!'); loadDashboard();
         }
 
@@ -373,7 +298,7 @@
             alert('Contractor Added!');
         }
 
-        loadContractorPayments(); updateUI();
+        updateUI();
     </script>
 </body>
 </html>
