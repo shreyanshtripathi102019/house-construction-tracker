@@ -15,7 +15,8 @@
             --accent-dark: #91471d;
             --border: #e8d9c9;
             --success: #1f7a50;
-            --danger: #b33c2f;
+            --danger: #b33c2f;697
+            
             --shadow: 0 20px 50px rgba(88, 55, 24, 0.08);
         }
 
@@ -694,7 +695,7 @@
         }
 
         function ensureApiConfigured() {
-            if (!CONFIG.API_URL || CONFIG.API_URL.includes("https://script.google.com/macros/s/AKfycbzxyl6V3Lz2rgqEdt68yBBc2bDaT2B2EzOxrUQ08rFB5UbV15G8pgpSxCZWK2EU_IGp/exec")) {
+            if (!CONFIG.API_URL) {
                 throw new Error("API_URL is not configured yet. Replace https://script.google.com/macros/s/AKfycbzxyl6V3Lz2rgqEdt68yBBc2bDaT2B2EzOxrUQ08rFB5UbV15G8pgpSxCZWK2EU_IGp/exec in index.html with the deployed Apps Script /exec URL.");
             }
         }
