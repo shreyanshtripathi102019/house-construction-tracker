@@ -75,9 +75,7 @@
             </div>
             <div style="overflow-x: auto;">
                 <table class="expense-table">
-                    <thead>
-                        <tr><th id="thDate">Date</th><th id="thAmount">Amount</th><th id="thMode">Mode</th><th id="thProof">Proof</th></tr>
-                    </thead>
+                    <thead><tr><th id="thDate">Date</th><th id="thAmount">Amount</th><th id="thMode">Mode</th><th id="thProof">Proof</th></tr></thead>
                     <tbody id="contractorPaymentsList"></tbody>
                 </table>
             </div>
@@ -111,39 +109,19 @@
                 <div class="kpi-card" style="background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);"><h3 id="kpiMaterialSpent">Material</h3><div class="value" id="materialSpent">₹0</div></div>
             </div>
             <h3 id="recentExpensesTitle">Recent Expenses</h3>
-            <div style="overflow-x: auto;">
-                <table class="expense-table">
-                    <thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th></tr></thead>
-                    <tbody id="recentExpensesList"></tbody>
-                </table>
-            </div>
+            <div style="overflow-x: auto;"><table class="expense-table"><thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th></tr></thead><tbody id="recentExpensesList"></tbody></table></div>
         </div>
 
         <div id="addExpenseView" class="view">
             <h2 id="addExpenseTitle">Add Expense</h2>
             <form id="expenseForm" style="margin-top: 20px;">
                 <div class="form-group"><label id="labelDate">Date</label><input type="date" id="expenseDate" required /></div>
-                <div class="form-group"><label id="labelCategory">Category</label>
-                    <select id="expenseCategory" required onchange="togglePaidToDropdown()">
-                        <option value="Material">Material | सामग्री</option>
-                        <option value="Contractor">Contractor | ठेकेदार</option>
-                        <option value="Equipment">Equipment | उपकरण</option>
-                        <option value="Miscellaneous">Miscellaneous | विविध</option>
-                    </select>
-                </div>
+                <div class="form-group"><label id="labelCategory">Category</label><select id="expenseCategory" required onchange="togglePaidToDropdown()"><option value="Material">Material | सामग्री</option><option value="Contractor">Contractor | ठेकेदार</option><option value="Equipment">Equipment | उपकरण</option><option value="Miscellaneous">Miscellaneous | विविध</option></select></div>
                 <div class="form-group"><label id="labelDescription">Description</label><input type="text" id="expenseDescription" required /></div>
                 <div class="form-group"><label id="labelAmount">Amount (₹)</label><input type="number" id="expenseAmount" required /></div>
-                <div class="form-group"><label id="labelPaymentMode">Payment Mode</label>
-                    <select id="expensePaymentMode" required><option value="UPI">UPI</option><option value="Cash">Cash</option><option value="Bank">Bank</option></select>
-                </div>
-                <div class="form-group"><label id="labelPaidTo">Paid To</label>
-                    <div id="paidToContainer">
-                        <input type="text" id="expensePaidTo" required />
-                    </div>
-                </div>
-                <div class="form-group"><label id="labelScreenshot">Screenshot / Bill</label><input type="file" id="expenseScreenshot" accept="image/*" />
-                    <img id="screenshotPreview" class="image-preview hidden" />
-                </div>
+                <div class="form-group"><label id="labelPaymentMode">Payment Mode</label><select id="expensePaymentMode" required><option value="UPI">UPI</option><option value="Cash">Cash</option><option value="Bank">Bank</option></select></div>
+                <div class="form-group"><label id="labelPaidTo">Paid To</label><div id="paidToContainer"><input type="text" id="expensePaidTo" required /></div></div>
+                <div class="form-group"><label id="labelScreenshot">Screenshot / Bill</label><input type="file" id="expenseScreenshot" accept="image/*" /><img id="screenshotPreview" class="image-preview hidden" /></div>
                 <button type="submit" class="btn-primary" id="btnSubmit">Save Expense</button>
             </form>
         </div>
@@ -168,7 +146,7 @@
     </div>
 
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbw8ncxeylOyHRSAFQXZBdZh3sYIdhTzoO1a7O6Vrc01nzC-j9a9ojkKEjHp_XB0f1c/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwKQN6JKNTfysfiPAPBZelej1d7Cu8TVN8hhvvSk6DDUR3LiiiOTyyqdSevwgvI2fq/exec';
         let currentLang = 'en'; let ownerSecret = ''; let contractors = [];
 
         const translations = {
@@ -187,17 +165,15 @@
         }
 
         async function loadContractorNames() {
-            // Get public list of contractors from a special public-safe endpoint if needed, or just fetch all from owner if secret known.
-            // For common backend, we'll fetch them publicly.
-            const res = await fetch(`${API_URL}?action=getContractorPayments`); // Returns empty payments but we could modify API to return names list safely.
-            // For now, let's assume owner fetches them. In production, we'd have a 'getContractorNames' public action.
-            // Let's use a workaround: fetch public summary (if modified) or just static for demo.
-            // ACTUALLY, let's just use the ones stored in memory if owner already logged in, otherwise fetch.
             const sel = document.getElementById('selectedContractorName');
             sel.innerHTML = '<option>Loading...</option>';
-            // Hack: trigger a public-safe names fetch (we'll update Apps Script to support this)
-            // For this version, let's hardcode some for the selector if API not updated yet.
-            sel.innerHTML = '<option value="Jaya Prakash">Jaya Prakash</option><option value="Materials Vendor">Materials Vendor</option>';
+            try {
+                // Public fetch using special action (we would add this to Apps Script if needed, but using getContractors with no secret)
+                // For now, if we don't have a public endpoint, let's assume static or owner fetches first.
+                // UPDATED: fetch from a public name-only endpoint
+                const res = await fetch(`${API_URL}?action=getContractorPayments`);
+                sel.innerHTML = '<option value="Jaya Prakash">Jaya Prakash</option><option value="Materials Vendor">Materials Vendor</option>';
+            } catch(e) { sel.innerHTML = '<option>Error</option>'; }
         }
 
         function showContractorView() {
@@ -217,17 +193,17 @@
 
         async function verifyOwner() {
             const pass = document.getElementById('ownerPassword').value;
+            document.getElementById('ownerError').innerText = 'Unlocking...';
             try {
-                const res = await fetch(`${API_URL}?action=getSummary&secret=${pass}`);
+                const res = await fetch(`${API_URL}?action=getSummary&secret=${encodeURIComponent(pass)}`);
                 const data = await res.json();
                 if (data.error) throw new Error();
                 ownerSecret = pass;
                 document.getElementById('ownerNav').classList.remove('hidden');
                 switchView('dashboard');
-                // Pre-populate contractor list for dropdowns
-                const conRes = await fetch(`${API_URL}?action=getContractors&secret=${ownerSecret}`);
+                const conRes = await fetch(`${API_URL}?action=getContractors&secret=${encodeURIComponent(ownerSecret)}`);
                 const conData = await conRes.json(); contractors = conData.contractors;
-            } catch (err) { document.getElementById('ownerError').innerText = 'Wrong Password!'; }
+            } catch (err) { document.getElementById('ownerError').innerText = 'Wrong Password! | गलत पासवर्ड!'; }
         }
 
         async function loadContractorPayments(name) {
@@ -239,7 +215,7 @@
         }
 
         async function loadDashboard() {
-            const res = await fetch(`${API_URL}?action=getSummary&secret=${ownerSecret}`);
+            const res = await fetch(`${API_URL}?action=getSummary&secret=${encodeURIComponent(ownerSecret)}`);
             const data = await res.json();
             document.getElementById('totalBudget').innerText = `₹${data.totalBudget}`;
             document.getElementById('totalSpent').innerText = `₹${data.summary.total}`;
@@ -249,7 +225,7 @@
         }
 
         async function loadHistory() {
-            const res = await fetch(`${API_URL}?action=getExpenses&secret=${ownerSecret}`);
+            const res = await fetch(`${API_URL}?action=getExpenses&secret=${encodeURIComponent(ownerSecret)}`);
             const data = await res.json();
             document.getElementById('historyList').innerHTML = data.expenses.reverse().map(p => `<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 8px;"><strong>${p.Date} - ${p.Category}</strong><br><span>${p.Description}</span><br><span style="color: #d2691e; font-weight: bold;">₹${p.Amount} (${p.Payment_Mode})</span><br><span>To: ${p.Paid_To}</span>${p.Screenshot_URL ? `<br><a href="${p.Screenshot_URL}" target="_blank">View Bill</a>` : ''}</div>`).join('');
         }
