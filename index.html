@@ -132,9 +132,8 @@
             <h2 id="settingsTitle">Settings</h2>
             <div class="settings-card" style="margin-top: 20px;">
                 <h3>Set Budget</h3>
-                <div class="form-group"><label>Contractor Budget</label><input type="number" id="setBudgetContractor" /></div>
-                <div class="form-group"><label>Material Budget</label><input type="number" id="setBudgetMaterial" /></div>
-                <button class="btn-primary" onclick="updateBudgets()">Save Budgets</button>
+                <div class="form-group"><label>Total Budget</label><input type="number" id="setBudgetTotal" /></div>
+                <button class="btn-primary" onclick="updateBudgets()">Save Budget</button>
             </div>
             <div class="settings-card">
                 <h3>Add Contractor</h3>
@@ -146,51 +145,45 @@
     </div>
 
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbwKQN6JKNTfysfiPAPBZelej1d7Cu8TVN8hhvvSk6DDUR3LiiiOTyyqdSevwgvI2fq/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwcgQ23k88P8Vjw4yskGjF7cdnqPxvr861MbAATcXTXAYPCrqrH7m1Eb7WyFzgTdB-5/exec';
         let currentLang = 'en'; let ownerSecret = ''; let contractors = [];
-
         const translations = {
-            en: { mainTitle: 'House Construction Tracker', selectTitle: 'Choose Your View', selectLabel: 'I am a', contractorTitle: 'Payment Proofs', contractorTotalLabel: 'Total Paid', thDate: 'Date', thAmount: 'Amount', thMode: 'Mode', thProof: 'Proof', btnOwnerAccess: 'Owner Access', ownerLoginTitle: 'Owner Login', ownerLoginText: 'Enter owner password', dashTitle: 'Owner Dashboard', kpiTotalBudget: 'Budget', kpiTotalSpent: 'Spent', kpiContractorPaid: 'Contractor', kpiMaterialSpent: 'Material', recentExpensesTitle: 'Recent Expenses', navDashboard: 'Dashboard', navAddExpense: 'Add Expense', navHistory: 'History', navSettings: 'Settings', addExpenseTitle: 'Add Expense', labelDate: 'Date', labelCategory: 'Category', labelDescription: 'Description', labelAmount: 'Amount (₹)', labelPaymentMode: 'Payment Mode', labelPaidTo: 'Paid To', labelScreenshot: 'Screenshot / Bill', btnSubmit: 'Save Expense', historyTitle: 'Full History', settingsTitle: 'Settings' },
-            hi: { mainTitle: 'घर निर्माण ट्रैकर', selectTitle: 'अपना दृश्य चुनें', selectLabel: 'मैं हूँ एक', contractorTitle: 'भुगतान प्रमाण', contractorTotalLabel: 'कुल भुगतान', thDate: 'तारीख', thAmount: 'राशि', thMode: 'तरीका', thProof: 'प्रमाण', btnOwnerAccess: 'मालिक पहुंच', ownerLoginTitle: 'मालिक लॉगिन', ownerLoginText: 'पासवर्ड डालें', dashTitle: 'मालिक डैशबोर्ड', kpiTotalBudget: 'बजट', kpiTotalSpent: 'खर्च', kpiContractorPaid: 'ठेकेदार', kpiMaterialSpent: 'सामग्री', recentExpensesTitle: 'हाल के खर्च', navDashboard: 'डैशबोर्ड', navAddExpense: 'खर्च जोड़ें', navHistory: 'इतिहास', navSettings: 'सेटिंग्स', addExpenseTitle: 'खर्च जोड़ें', labelDate: 'तारीख', labelCategory: 'श्रेणी', labelDescription: 'विवरण', labelAmount: 'राशि (₹)', labelPaymentMode: 'भुगतान तरीका', labelPaidTo: 'किसे भुगतान', labelScreenshot: 'स्क्रीनशॉट / बिल', btnSubmit: 'खर्च सहेजें', historyTitle: 'पूरा इतिहास', settingsTitle: 'सेटिंग्स' }
+            en: { mainTitle: 'House Construction Tracker', selectTitle: 'Choose Your View', selectLabel: 'I am a', contractorTitle: 'Payment Proofs', contractorTotalLabel: 'Total Paid', thDate: 'Date', thAmount: 'Amount', thMode: 'Mode', thProof: 'Proof', ownerLoginTitle: 'Owner Login', ownerLoginText: 'Enter owner password', dashTitle: 'Owner Dashboard', kpiTotalBudget: 'Budget', kpiTotalSpent: 'Spent', kpiContractorPaid: 'Contractor', kpiMaterialSpent: 'Material', recentExpensesTitle: 'Recent Expenses', navDashboard: 'Dashboard', navAddExpense: 'Add Expense', navHistory: 'History', navSettings: 'Settings', addExpenseTitle: 'Add Expense', labelDate: 'Date', labelCategory: 'Category', labelDescription: 'Description', labelAmount: 'Amount (₹)', labelPaymentMode: 'Payment Mode', labelPaidTo: 'Paid To', labelScreenshot: 'Screenshot / Bill', btnSubmit: 'Save Expense', historyTitle: 'Full History', settingsTitle: 'Settings' },
+            hi: { mainTitle: 'घर निर्माण ट्रैकर', selectTitle: 'अपना दृश्य चुनें', selectLabel: 'मैं हूँ एक', contractorTitle: 'भुगतान प्रमाण', contractorTotalLabel: 'कुल भुगतान', thDate: 'तारीख', thAmount: 'राशि', thMode: 'तरीका', thProof: 'प्रमाण', ownerLoginTitle: 'मालिक लॉगिन', ownerLoginText: 'पासवर्ड डालें', dashTitle: 'मालिक डैशबोर्ड', kpiTotalBudget: 'बजट', kpiTotalSpent: 'खर्च', kpiContractorPaid: 'ठेकेदार', kpiMaterialSpent: 'सामग्री', recentExpensesTitle: 'हाल के खर्च', navDashboard: 'डैशबोर्ड', navAddExpense: 'खर्च जोड़ें', navHistory: 'इतिहास', navSettings: 'सेटिंग्स', addExpenseTitle: 'खर्च जोड़ें', labelDate: 'तारीख', labelCategory: 'श्रेणी', labelDescription: 'विवरण', labelAmount: 'राशि (₹)', labelPaymentMode: 'भुगतान तरीका', labelPaidTo: 'किसे भुगतान', labelScreenshot: 'स्क्रीनशॉट / बिल', btnSubmit: 'खर्च सहेजें', historyTitle: 'पूरा इतिहास', settingsTitle: 'सेटिंग्स' }
         };
-
         function toggleLanguage() { currentLang = currentLang === 'en' ? 'hi' : 'en'; updateUI(); }
         function updateUI() { const t = translations[currentLang]; for (let id in t) { const el = document.getElementById(id); if (el) el.innerText = t[id]; } }
-
         function handleUserTypeChange() {
             const type = document.getElementById('userType').value;
             document.getElementById('contractorSelector').classList.toggle('hidden', type !== 'contractor');
             document.getElementById('ownerButtonBox').classList.toggle('hidden', type !== 'owner');
             if (type === 'contractor') loadContractorNames();
         }
-
         async function loadContractorNames() {
             const sel = document.getElementById('selectedContractorName');
             sel.innerHTML = '<option>Loading...</option>';
             try {
-                // Public fetch using special action (we would add this to Apps Script if needed, but using getContractors with no secret)
-                // For now, if we don't have a public endpoint, let's assume static or owner fetches first.
-                // UPDATED: fetch from a public name-only endpoint
-                const res = await fetch(`${API_URL}?action=getContractorPayments`);
-                sel.innerHTML = '<option value="Jaya Prakash">Jaya Prakash</option><option value="Materials Vendor">Materials Vendor</option>';
+                const res = await fetch(`${API_URL}?action=getContractors&secret=PUBLIC`);
+                const data = await res.json();
+                sel.innerHTML = data.contractors.map(c => `<option value="${c.Name}">${c.Name}</option>`).join('');
             } catch(e) { sel.innerHTML = '<option>Error</option>'; }
         }
-
         function showContractorView() {
             const name = document.getElementById('selectedContractorName').value;
             if (!name) return;
             switchView('contractor');
             loadContractorPayments(name);
         }
-
         function switchView(viewId) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById(viewId + 'View').classList.add('active');
-            if (ownerSecret) document.getElementById('ownerNav').classList.toggle('hidden', viewId === 'selection' || viewId === 'contractor');
+            if (ownerSecret) {
+                document.getElementById('ownerNav').classList.toggle('hidden', viewId === 'selection' || viewId === 'contractor');
+                if (viewId === 'dashboard') loadDashboard();
+                if (viewId === 'history') loadHistory();
+            }
         }
-
         function showOwnerLogin() { switchView('ownerLogin'); }
-
         async function verifyOwner() {
             const pass = document.getElementById('ownerPassword').value;
             document.getElementById('ownerError').innerText = 'Unlocking...';
@@ -203,9 +196,8 @@
                 switchView('dashboard');
                 const conRes = await fetch(`${API_URL}?action=getContractors&secret=${encodeURIComponent(ownerSecret)}`);
                 const conData = await conRes.json(); contractors = conData.contractors;
-            } catch (err) { document.getElementById('ownerError').innerText = 'Wrong Password! | गलत पासवर्ड!'; }
+            } catch (err) { document.getElementById('ownerError').innerText = 'Wrong Password!'; }
         }
-
         async function loadContractorPayments(name) {
             const res = await fetch(`${API_URL}?action=getContractorPayments&contractorName=${encodeURIComponent(name)}`);
             const data = await res.json();
@@ -213,7 +205,6 @@
             document.getElementById('contractorTotalPaid').innerText = `₹${data.total}`;
             document.getElementById('contractorTitle').innerText = `${name} - Payments`;
         }
-
         async function loadDashboard() {
             const res = await fetch(`${API_URL}?action=getSummary&secret=${encodeURIComponent(ownerSecret)}`);
             const data = await res.json();
@@ -223,13 +214,11 @@
             document.getElementById('materialSpent').innerText = `₹${data.summary.Material}`;
             document.getElementById('recentExpensesList').innerHTML = data.recentExpenses.map(p => `<tr><td>${p.Date}</td><td>${p.Category}</td><td>${p.Description}</td><td>₹${p.Amount}</td></tr>`).join('');
         }
-
         async function loadHistory() {
             const res = await fetch(`${API_URL}?action=getExpenses&secret=${encodeURIComponent(ownerSecret)}`);
             const data = await res.json();
             document.getElementById('historyList').innerHTML = data.expenses.reverse().map(p => `<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 8px;"><strong>${p.Date} - ${p.Category}</strong><br><span>${p.Description}</span><br><span style="color: #d2691e; font-weight: bold;">₹${p.Amount} (${p.Payment_Mode})</span><br><span>To: ${p.Paid_To}</span>${p.Screenshot_URL ? `<br><a href="${p.Screenshot_URL}" target="_blank">View Bill</a>` : ''}</div>`).join('');
         }
-
         function togglePaidToDropdown() {
             const cat = document.getElementById('expenseCategory').value;
             const container = document.getElementById('paidToContainer');
@@ -239,13 +228,11 @@
                 container.innerHTML = `<input type="text" id="expensePaidTo" required />`;
             }
         }
-
         document.getElementById('expenseScreenshot').onchange = function(e) {
             const reader = new FileReader();
             reader.onload = () => { document.getElementById('screenshotPreview').src = reader.result; document.getElementById('screenshotPreview').classList.remove('hidden'); };
             reader.readAsDataURL(e.target.files[0]);
         };
-
         document.getElementById('expenseForm').onsubmit = async function(e) {
             e.preventDefault();
             const btn = document.getElementById('btnSubmit'); btn.innerText = 'Saving...'; btn.disabled = true;
@@ -260,21 +247,18 @@
             const data = await res.json(); if (data.success) { alert('Saved!'); document.getElementById('expenseForm').reset(); document.getElementById('screenshotPreview').classList.add('hidden'); switchView('dashboard'); }
             btn.innerText = translations[currentLang].btnSubmit; btn.disabled = false;
         };
-
         async function updateBudgets() {
-            const budgets = [{ cat: 'Contractor', val: document.getElementById('setBudgetContractor').value }, { cat: 'Material', val: document.getElementById('setBudgetMaterial').value }];
-            for (let b of budgets) { if (b.val) await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateBudget', secret: ownerSecret, category: b.cat, amount: b.val }) }); }
-            alert('Budgets Updated!'); loadDashboard();
+            const val = document.getElementById('setBudgetTotal').value;
+            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateBudget', secret: ownerSecret, amount: val }) });
+            alert('Budget Updated!'); loadDashboard();
         }
-
         async function addContractor() {
             const name = document.getElementById('newConName').value;
             const agreed = document.getElementById('newConAgreed').value;
             await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'addContractor', secret: ownerSecret, name, agreedAmount: agreed }) });
             alert('Contractor Added!');
         }
-
         updateUI();
     </script>
 </body>
-</html>
+</html> Enter
