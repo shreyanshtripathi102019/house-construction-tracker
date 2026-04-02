@@ -6,17 +6,17 @@
     <title>House Construction Tracker</title>
     <style>
         :root {
-            --bg: #f5efe6;
-            --surface: #fffaf3;
+            --bg: #edf4f2;
+            --surface: #f9fcfb;
             --surface-strong: #ffffff;
-            --ink: #2a211b;
-            --muted: #6f655d;
-            --accent: #b8602f;
-            --accent-dark: #91471d;
-            --border: #e8d9c9;
-            --success: #1f7a50;
-            --danger: #b33c2f;
-            --shadow: 0 20px 50px rgba(88, 55, 24, 0.08);
+            --ink: #18302b;
+            --muted: #59706a;
+            --accent: #1f6f66;
+            --accent-dark: #154b45;
+            --border: #d5e5e0;
+            --success: #1d7b59;
+            --danger: #b24a3f;
+            --shadow: 0 24px 60px rgba(24, 48, 43, 0.08);
         }
 
         * {
@@ -28,8 +28,8 @@
             font-family: "Avenir Next", "Segoe UI", sans-serif;
             color: var(--ink);
             background:
-                radial-gradient(circle at top left, rgba(184, 96, 47, 0.14), transparent 28%),
-                radial-gradient(circle at right, rgba(30, 122, 80, 0.12), transparent 24%),
+                radial-gradient(circle at top left, rgba(31, 111, 102, 0.16), transparent 28%),
+                radial-gradient(circle at right, rgba(95, 140, 120, 0.16), transparent 24%),
                 var(--bg);
         }
 
@@ -72,7 +72,9 @@
         }
 
         .hero {
-            background: linear-gradient(135deg, rgba(184, 96, 47, 0.92), rgba(145, 71, 29, 0.96));
+            background:
+                radial-gradient(circle at top right, rgba(255, 255, 255, 0.12), transparent 28%),
+                linear-gradient(135deg, #1f6f66, #234d6b 58%, #18302b);
             color: white;
             border-radius: 28px;
             padding: 32px;
@@ -175,9 +177,9 @@
         }
 
         .banner.info {
-            background: #fff3df;
-            border-color: #f1d1aa;
-            color: #8a4c19;
+            background: #eaf7f4;
+            border-color: #c8e6df;
+            color: #225b53;
         }
 
         .banner.success {
@@ -222,7 +224,7 @@
         }
 
         .stats-card.accent {
-            background: linear-gradient(135deg, #b8602f, #cf8a57);
+            background: linear-gradient(135deg, #1f6f66, #2f8c80);
             color: white;
             border-color: transparent;
         }
@@ -430,17 +432,17 @@
 <body>
     <div class="container">
         <div class="topbar">
-            <a class="brand-link" href="index.html" data-i18n="brandShort">House Construction Tracker</a>
+            <a class="brand-link" href="index.html" data-i18n="brandShort">Construction Expense Tracker</a>
             <button id="languageToggle" class="lang-toggle" type="button" onclick="toggleLanguage()">हिंदी</button>
         </div>
 
         <div id="banner" class="banner info hidden"></div>
 
         <section id="homeView" class="hero">
-            <div class="eyebrow" data-i18n="homeEyebrow">House Construction Tracker</div>
-            <h1 data-i18n="homeTitle">Keep owner payments and contractor receipts in sync.</h1>
+            <div class="eyebrow" data-i18n="homeEyebrow">Construction Expense Tracker</div>
+            <h1 data-i18n="homeTitle">Track construction expenses and payment records in one place.</h1>
             <p data-i18n="homeDescription">
-                One clear home screen with separate page-style views for the contractor and the owner dashboard.
+                One clear home screen with separate page-style views for the contractor and the private project dashboard.
             </p>
 
             <div class="mode-grid">
@@ -453,11 +455,11 @@
                 </div>
 
                 <div class="mode-card">
-                    <h2 data-i18n="ownerCardTitle">Owner Dashboard</h2>
+                    <h2 data-i18n="ownerCardTitle">Private Dashboard</h2>
                     <p data-i18n="ownerCardDescription">
-                        Open a dedicated owner page to log in, add expenses, manage contractors, and review history.
+                        Open a dedicated dashboard page to sign in, add expenses, manage contractors, and review history.
                     </p>
-                    <a class="btn" href="?view=owner" data-i18n="ownerCardButton">Open Owner Page</a>
+                    <a class="btn" href="?view=owner" data-i18n="ownerCardButton">Open Dashboard</a>
                 </div>
             </div>
         </section>
@@ -511,20 +513,20 @@
             <section id="ownerLoginView" class="panel hidden">
                 <div class="panel-title-row">
                     <div>
-                        <h2 data-i18n="ownerLoginTitle">Owner Login</h2>
-                        <p class="panel-copy" data-i18n="ownerLoginDescription">Enter the owner password to open the dashboard.</p>
+                        <h2 data-i18n="ownerLoginTitle">Private Login</h2>
+                        <p class="panel-copy" data-i18n="ownerLoginDescription">Enter the dashboard password to open the private project dashboard.</p>
                     </div>
                     <a class="secondary-btn" href="index.html" data-i18n="backHome">Back to Home</a>
                 </div>
 
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="ownerPassword" data-i18n="ownerPasswordLabel">Owner Password</label>
+                        <label for="ownerPassword" data-i18n="ownerPasswordLabel">Dashboard Password</label>
                         <input id="ownerPassword" type="password" data-i18n-placeholder="ownerPasswordPlaceholder" placeholder="Enter password" />
                     </div>
                     <div class="form-group">
                         <label>&nbsp;</label>
-                        <button class="btn" type="button" onclick="loginOwner()" data-i18n="unlockDashboard">Unlock Dashboard</button>
+                        <button class="btn" type="button" onclick="loginOwner()" data-i18n="unlockDashboard">Open Dashboard</button>
                     </div>
                 </div>
                 <p id="ownerLoginMessage" class="footer-note"></p>
@@ -534,12 +536,12 @@
                 <div class="panel">
                     <div class="panel-title-row">
                         <div>
-                            <h2 data-i18n="ownerDashboardTitle">Owner Dashboard</h2>
+                            <h2 data-i18n="ownerDashboardTitle">Project Dashboard</h2>
                             <p class="panel-copy" data-i18n="ownerDashboardDescription">
-                                Track budget, contractor payments, material spending, and all saved expenses.
+                                Track budget, work payments, material spending, and all saved expenses.
                             </p>
                         </div>
-                        <button class="secondary-btn" type="button" onclick="logoutOwner()" data-i18n="logout">Log Out</button>
+                        <button class="secondary-btn" type="button" onclick="logoutOwner()" data-i18n="logout">Exit Dashboard</button>
                     </div>
 
                     <div class="owner-nav">
@@ -561,7 +563,7 @@
                             <div class="value" id="spentValue">₹0</div>
                         </div>
                         <div class="stats-card">
-                            <div class="label" data-i18n="paidToContractors">Paid To Contractors</div>
+                            <div class="label" data-i18n="paidToContractors">Work Payments</div>
                             <div class="value" id="contractorSpentValue">₹0</div>
                         </div>
                         <div class="stats-card">
@@ -717,37 +719,37 @@
 
         const TRANSLATIONS = {
             en: {
-                brandShort: "House Construction Tracker",
-                homeEyebrow: "House Construction Tracker",
-                homeTitle: "Keep owner payments and contractor receipts in sync.",
-                homeDescription: "One clear home screen with separate page-style views for the contractor and the owner dashboard.",
+                brandShort: "Construction Expense Tracker",
+                homeEyebrow: "Construction Expense Tracker",
+                homeTitle: "Track construction expenses and payment records in one place.",
+                homeDescription: "One clear home screen with separate page-style views for the contractor and the private project dashboard.",
                 contractorCardTitle: "Contractor View",
                 contractorCardDescription: "Open a dedicated contractor page to see recorded payments, received amount, and proof links.",
                 contractorCardButton: "Open Contractor Page",
-                ownerCardTitle: "Owner Dashboard",
-                ownerCardDescription: "Open a dedicated owner page to log in, add expenses, manage contractors, and review history.",
-                ownerCardButton: "Open Owner Page",
+                ownerCardTitle: "Private Dashboard",
+                ownerCardDescription: "Open a dedicated dashboard page to sign in, add expenses, manage contractors, and review history.",
+                ownerCardButton: "Open Dashboard",
                 contractorPageTitle: "Contractor Payments",
                 contractorPageDescription: "Select your name and see how much payment has been recorded with proof.",
                 contractorNameLabel: "Contractor Name",
                 loadPayments: "Load Payments",
                 totalReceived: "Total Received",
                 backHome: "Back to Home",
-                ownerLoginTitle: "Owner Login",
-                ownerLoginDescription: "Enter the owner password to open the dashboard.",
-                ownerPasswordLabel: "Owner Password",
+                ownerLoginTitle: "Private Login",
+                ownerLoginDescription: "Enter the dashboard password to open the private project dashboard.",
+                ownerPasswordLabel: "Dashboard Password",
                 ownerPasswordPlaceholder: "Enter password",
-                unlockDashboard: "Unlock Dashboard",
-                ownerDashboardTitle: "Owner Dashboard",
-                ownerDashboardDescription: "Track budget, contractor payments, material spending, and all saved expenses.",
-                logout: "Log Out",
+                unlockDashboard: "Open Dashboard",
+                ownerDashboardTitle: "Project Dashboard",
+                ownerDashboardDescription: "Track budget, work payments, material spending, and all saved expenses.",
+                logout: "Exit Dashboard",
                 tabDashboard: "Dashboard",
                 tabAddExpense: "Add Expense",
                 tabHistory: "History",
                 tabSettings: "Settings",
                 totalBudget: "Total Budget",
                 totalSpent: "Total Spent",
-                paidToContractors: "Paid To Contractors",
+                paidToContractors: "Work Payments",
                 materialSpend: "Material Spend",
                 recentExpensesTitle: "Recent Expenses",
                 addExpenseTitle: "Add Expense",
@@ -800,47 +802,47 @@
                 paidToPrefix: "Paid To",
                 modePrefix: "Mode",
                 openBill: "Open Bill / Screenshot",
-                ownerPasswordFirst: "Enter the owner password first.",
+                ownerPasswordFirst: "Enter the dashboard password first.",
                 checkingPassword: "Checking password...",
-                ownerUnlocked: "Owner dashboard unlocked successfully.",
-                ownerSessionClosed: "Owner session closed.",
+                ownerUnlocked: "Project dashboard opened successfully.",
+                ownerSessionClosed: "Dashboard session closed.",
                 expenseSaved: "Expense saved successfully.",
                 budgetUpdated: "Budget updated successfully.",
                 contractorSaved: "Contractor saved successfully.",
                 fileReadError: "Could not read the selected file."
             },
             hi: {
-                brandShort: "घर निर्माण ट्रैकर",
-                homeEyebrow: "घर निर्माण ट्रैकर",
-                homeTitle: "मालिक के भुगतान और ठेकेदार की प्राप्ति को एक ही जगह स्पष्ट रखें।",
-                homeDescription: "एक साफ होम स्क्रीन, और ठेकेदार तथा मालिक डैशबोर्ड के लिए अलग पेज जैसे दृश्य।",
+                brandShort: "निर्माण खर्च ट्रैकर",
+                homeEyebrow: "निर्माण खर्च ट्रैकर",
+                homeTitle: "निर्माण के खर्च और भुगतान रिकॉर्ड एक ही जगह स्पष्ट रखें।",
+                homeDescription: "एक साफ होम स्क्रीन, और ठेकेदार तथा निजी प्रोजेक्ट डैशबोर्ड के लिए अलग पेज जैसे दृश्य।",
                 contractorCardTitle: "ठेकेदार दृश्य",
                 contractorCardDescription: "एक अलग ठेकेदार पेज खोलें जहां दर्ज भुगतान, प्राप्त राशि और प्रूफ लिंक दिखें।",
                 contractorCardButton: "ठेकेदार पेज खोलें",
-                ownerCardTitle: "मालिक डैशबोर्ड",
-                ownerCardDescription: "एक अलग मालिक पेज खोलें जहां लॉगिन, खर्च जोड़ना, ठेकेदार प्रबंधन और हिस्ट्री देखना हो सके।",
-                ownerCardButton: "मालिक पेज खोलें",
+                ownerCardTitle: "निजी डैशबोर्ड",
+                ownerCardDescription: "एक अलग डैशबोर्ड पेज खोलें जहां साइन इन, खर्च जोड़ना, ठेकेदार प्रबंधन और हिस्ट्री देखना हो सके।",
+                ownerCardButton: "डैशबोर्ड खोलें",
                 contractorPageTitle: "ठेकेदार भुगतान",
                 contractorPageDescription: "अपना नाम चुनें और देखें कि कितना भुगतान प्रूफ के साथ दर्ज है।",
                 contractorNameLabel: "ठेकेदार का नाम",
                 loadPayments: "भुगतान देखें",
                 totalReceived: "कुल प्राप्त राशि",
                 backHome: "होम पर वापस जाएं",
-                ownerLoginTitle: "मालिक लॉगिन",
-                ownerLoginDescription: "डैशबोर्ड खोलने के लिए मालिक का पासवर्ड दर्ज करें।",
-                ownerPasswordLabel: "मालिक पासवर्ड",
+                ownerLoginTitle: "निजी लॉगिन",
+                ownerLoginDescription: "निजी प्रोजेक्ट डैशबोर्ड खोलने के लिए डैशबोर्ड पासवर्ड दर्ज करें।",
+                ownerPasswordLabel: "डैशबोर्ड पासवर्ड",
                 ownerPasswordPlaceholder: "पासवर्ड दर्ज करें",
                 unlockDashboard: "डैशबोर्ड खोलें",
-                ownerDashboardTitle: "मालिक डैशबोर्ड",
-                ownerDashboardDescription: "बजट, ठेकेदार भुगतान, सामग्री खर्च और सभी सेव किए गए खर्च यहां देखें।",
-                logout: "लॉग आउट",
+                ownerDashboardTitle: "प्रोजेक्ट डैशबोर्ड",
+                ownerDashboardDescription: "बजट, कार्य भुगतान, सामग्री खर्च और सभी सेव किए गए खर्च यहां देखें।",
+                logout: "डैशबोर्ड बंद करें",
                 tabDashboard: "डैशबोर्ड",
                 tabAddExpense: "खर्च जोड़ें",
                 tabHistory: "हिस्ट्री",
                 tabSettings: "सेटिंग्स",
                 totalBudget: "कुल बजट",
                 totalSpent: "कुल खर्च",
-                paidToContractors: "ठेकेदारों को भुगतान",
+                paidToContractors: "कार्य भुगतान",
                 materialSpend: "सामग्री खर्च",
                 recentExpensesTitle: "हाल के खर्च",
                 addExpenseTitle: "खर्च जोड़ें",
@@ -893,10 +895,10 @@
                 paidToPrefix: "किसे भुगतान",
                 modePrefix: "तरीका",
                 openBill: "बिल / स्क्रीनशॉट खोलें",
-                ownerPasswordFirst: "पहले मालिक का पासवर्ड दर्ज करें।",
+                ownerPasswordFirst: "पहले डैशबोर्ड पासवर्ड दर्ज करें।",
                 checkingPassword: "पासवर्ड जांचा जा रहा है...",
-                ownerUnlocked: "मालिक डैशबोर्ड सफलतापूर्वक खुल गया।",
-                ownerSessionClosed: "मालिक सत्र बंद कर दिया गया।",
+                ownerUnlocked: "प्रोजेक्ट डैशबोर्ड सफलतापूर्वक खुल गया।",
+                ownerSessionClosed: "डैशबोर्ड सत्र बंद कर दिया गया।",
                 expenseSaved: "खर्च सफलतापूर्वक सेव हो गया।",
                 budgetUpdated: "बजट सफलतापूर्वक अपडेट हो गया।",
                 contractorSaved: "ठेकेदार सफलतापूर्वक सेव हो गया।",
@@ -1026,16 +1028,16 @@
         function updatePageTitle() {
             const titles = {
                 home: {
-                    en: "House Construction Tracker",
-                    hi: "घर निर्माण ट्रैकर"
+                    en: "Construction Expense Tracker",
+                    hi: "निर्माण खर्च ट्रैकर"
                 },
                 contractor: {
-                    en: "Contractor View | House Construction Tracker",
-                    hi: "ठेकेदार दृश्य | घर निर्माण ट्रैकर"
+                    en: "Contractor View | Construction Expense Tracker",
+                    hi: "ठेकेदार दृश्य | निर्माण खर्च ट्रैकर"
                 },
                 owner: {
-                    en: "Owner Dashboard | House Construction Tracker",
-                    hi: "मालिक डैशबोर्ड | घर निर्माण ट्रैकर"
+                    en: "Project Dashboard | Construction Expense Tracker",
+                    hi: "प्रोजेक्ट डैशबोर्ड | निर्माण खर्च ट्रैकर"
                 }
             };
 
