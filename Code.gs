@@ -8,6 +8,12 @@ const SETTINGS_KEYS = {
   TOTAL_BUDGET: 'TOTAL_BUDGET'
 };
 
+const ENTRY_KINDS = {
+  DIRECT_EXPENSE: 'DirectExpense',
+  ADVANCE_GIVEN: 'AdvanceGiven',
+  ADVANCE_SETTLEMENT: 'AdvanceSettlement'
+};
+
 function doGet(e) {
   return handleRequest_(e && e.parameter ? e.parameter : {});
 }
@@ -132,8 +138,13 @@ function getSummary_(payload) {
   const expenses = getAllExpenses_();
   const settings = readSettingsMap_();
   const summary = expenses.reduce(function(accumulator, expense) {
+    const entryKind = expense.EntryKind || ENTRY_KINDS.DIRECT_EXPENSE;
     const amount = toNumber_(expense.Amount);
     const category = String(expense.Category || 'Miscellaneous');
+
+    if (entryKind === ENTRY_KINDS.ADVANCE_GIVEN) {
+      return accumulator;
+    }
 
     accumulator.total += amount;
     accumulator[category] = (accumulator[category] || 0) + amount;
@@ -146,10 +157,31 @@ function getSummary_(payload) {
     Miscellaneous: 0
   });
 
+  const laluAdvanceBalance = expenses.reduce(function(balance, expense) {
+    const entryKind = expense.EntryKind || ENTRY_KINDS.DIRECT_EXPENSE;
+    const amount = toNumber_(expense.Amount);
+    const advanceParty = getAdvanceParty_(expense).toLowerCase();
+
+    if (advanceParty !== 'lalu') {
+      return balance;
+    }
+
+    if (entryKind === ENTRY_KINDS.ADVANCE_GIVEN) {
+      return balance + amount;
+    }
+
+    if (entryKind === ENTRY_KINDS.ADVANCE_SETTLEMENT) {
+      return balance - amount;
+    }
+
+    return balance;
+  }, 0);
+
   return {
     totalBudget: toNumber_(settings[SETTINGS_KEYS.TOTAL_BUDGET]),
     summary: summary,
-    recentExpenses: sortExpensesDesc_(expenses).slice(0, 5)
+    recentExpenses: sortExpensesDesc_(expenses).slice(0, 5),
+    laluAdvanceBalance: laluAdvanceBalance
   };
 }
 
@@ -169,11 +201,21 @@ function addExpense_(payload) {
   const description = String(payload.description || '').trim();
   const amount = toNumber_(payload.amount);
   const paymentMode = String(payload.paymentMode || '').trim();
-  const paidTo = String(payload.paidTo || '').trim();
+  const paidToValue = String(payload.paidTo || '').trim();
   const screenshotUrl = String(payload.screenshotUrl || '').trim();
+  const paidBy = String(payload.paidBy || '').trim();
+  const entryKind = String(payload.entryKind || ENTRY_KINDS.DIRECT_EXPENSE).trim();
+  const advanceParty = String(payload.advanceParty || '').trim();
+  const paidTo = entryKind === ENTRY_KINDS.ADVANCE_GIVEN && advanceParty
+    ? advanceParty
+    : paidToValue;
 
-  if (!date || !category || !description || !amount || !paymentMode || !paidTo) {
-    throw new Error('date, category, description, amount, paymentMode, and paidTo are required.');
+  if (!date || !category || !description || !amount || !paymentMode || !paidTo || !paidBy) {
+    throw new Error('date, category, description, amount, paymentMode, paidTo, and paidBy are required.');
+  }
+
+  if (Object.keys(ENTRY_KINDS).map(function(key) { return ENTRY_KINDS[key]; }).indexOf(entryKind) === -1) {
+    throw new Error('Invalid entry type.');
   }
 
   const sheet = getSpreadsheet_().getSheetByName(SHEET_NAMES.EXPENSES);
@@ -187,7 +229,10 @@ function addExpense_(payload) {
     paymentMode,
     paidTo,
     screenshotUrl,
-    new Date().toISOString()
+    new Date().toISOString(),
+    paidBy,
+    entryKind,
+    advanceParty
   ]);
 
   return { success: true };
@@ -283,7 +328,7 @@ function getSpreadsheet_() {
 function ensureStructure_(spreadsheet) {
   const settingsSheet = ensureSheet_(spreadsheet, SHEET_NAMES.SETTINGS, ['Key', 'Value']);
   const contractorsSheet = ensureSheet_(spreadsheet, SHEET_NAMES.CONTRACTORS, ['Name', 'Phone', 'WorkType', 'AgreedAmount']);
-  const expensesSheet = ensureSheet_(spreadsheet, SHEET_NAMES.EXPENSES, ['ID', 'Date', 'Category', 'Description', 'Amount', 'PaymentMode', 'PaidTo', 'ScreenshotUrl', 'CreatedAt']);
+  const expensesSheet = ensureSheet_(spreadsheet, SHEET_NAMES.EXPENSES, ['ID', 'Date', 'Category', 'Description', 'Amount', 'PaymentMode', 'PaidTo', 'ScreenshotUrl', 'CreatedAt', 'PaidBy', 'EntryKind', 'AdvanceParty']);
 
   settingsSheet.setFrozenRows(1);
   contractorsSheet.setFrozenRows(1);
@@ -380,9 +425,16 @@ function getAllExpenses_() {
       PaymentMode: expense.PaymentMode || '',
       PaidTo: expense.PaidTo || '',
       ScreenshotUrl: expense.ScreenshotUrl || '',
-      CreatedAt: expense.CreatedAt || ''
+      CreatedAt: expense.CreatedAt || '',
+      PaidBy: expense.PaidBy || '',
+      EntryKind: expense.EntryKind || ENTRY_KINDS.DIRECT_EXPENSE,
+      AdvanceParty: expense.AdvanceParty || ''
     };
   });
+}
+
+function getAdvanceParty_(expense) {
+  return String(expense.AdvanceParty || expense.PaidTo || '').trim();
 }
 
 function sortExpensesDesc_(expenses) {

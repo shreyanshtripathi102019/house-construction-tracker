@@ -594,6 +594,10 @@
                             <div class="label" data-i18n="materialSpend">Material Spend</div>
                             <div class="value" id="materialSpentValue">₹0</div>
                         </div>
+                        <div class="stats-card">
+                            <div class="label" data-i18n="laluAdvanceBalance">Lalu Advance Balance</div>
+                            <div class="value" id="laluAdvanceBalanceValue">₹0</div>
+                        </div>
                     </div>
 
                     <div class="panel" style="margin-top: 18px; padding: 20px;">
@@ -634,12 +638,28 @@
                                 <input id="expenseDate" type="date" required />
                             </div>
                             <div class="form-group">
+                                <label for="expenseEntryKind" data-i18n="labelEntryKind">Entry Type</label>
+                                <select id="expenseEntryKind" required onchange="syncExpenseFormState()">
+                                    <option value="DirectExpense" data-i18n="entryDirectExpense">Direct Expense</option>
+                                    <option value="AdvanceGiven" data-i18n="entryAdvanceGiven">Advance to Lalu</option>
+                                    <option value="AdvanceSettlement" data-i18n="entryAdvanceSettlement">Expense from Lalu Advance</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="expensePaidBy" data-i18n="labelPaidBy">Paid By</label>
+                                <select id="expensePaidBy" required>
+                                    <option value="Shreyansh" data-i18n="payerShreyansh">Shreyansh</option>
+                                    <option value="Rajesh" data-i18n="payerRajesh">Rajesh</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
                                 <label for="expenseCategory" data-i18n="labelCategory">Category</label>
-                                <select id="expenseCategory" required onchange="renderPaidToInput()">
+                                <select id="expenseCategory" required onchange="syncExpenseFormState()">
                                     <option value="Material" data-i18n="categoryMaterial">Material</option>
                                     <option value="Contractor" data-i18n="categoryContractor">Contractor</option>
                                     <option value="Equipment" data-i18n="categoryEquipment">Equipment</option>
                                     <option value="Miscellaneous" data-i18n="categoryMiscellaneous">Miscellaneous</option>
+                                    <option value="Advance" data-i18n="categoryAdvance">Advance</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -653,6 +673,12 @@
                                     <option value="Cash" data-i18n="paymentCash">Cash</option>
                                     <option value="Bank Transfer" data-i18n="paymentBankTransfer">Bank Transfer</option>
                                     <option value="Cheque" data-i18n="paymentCheque">Cheque</option>
+                                </select>
+                            </div>
+                            <div id="advancePartyGroup" class="form-group hidden">
+                                <label for="expenseAdvanceParty" data-i18n="labelAdvanceParty">Advance Holder</label>
+                                <select id="expenseAdvanceParty" onchange="syncExpenseFormState()">
+                                    <option value="Lalu" data-i18n="advancePartyLalu">Lalu</option>
                                 </select>
                             </div>
                             <div class="form-group full">
@@ -670,6 +696,8 @@
                                 <input id="expenseScreenshot" type="file" accept="image/*" />
                             </div>
                         </div>
+
+                        <p id="expenseFlowHint" class="footer-note"></p>
 
                         <div class="inline-actions">
                             <button id="saveExpenseBtn" class="btn" type="submit" data-i18n="saveExpense">Save Expense</button>
@@ -775,15 +803,19 @@
                 totalSpent: "Total Spent",
                 paidToContractors: "Work Payments",
                 materialSpend: "Material Spend",
+                laluAdvanceBalance: "Lalu Advance Balance",
                 recentExpensesTitle: "Recent Expenses",
                 addExpenseTitle: "Add Expense",
                 addExpenseDescription: "Use this form for contractor payments and other construction expenses.",
                 labelDate: "Date",
+                labelEntryKind: "Entry Type",
+                labelPaidBy: "Paid By",
                 labelCategory: "Category",
                 labelAmount: "Amount",
                 labelPaymentMode: "Payment Mode",
                 labelDescription: "Description",
                 labelPaidTo: "Paid To",
+                labelAdvanceParty: "Advance Holder",
                 labelScreenshot: "Bill / Screenshot",
                 saveExpense: "Save Expense",
                 clearForm: "Clear Form",
@@ -799,10 +831,17 @@
                 contractorFieldAgreedAmount: "Agreed Amount",
                 saveContractor: "Save Contractor",
                 settingsNote: "Manage the master budget and contractor list from this page.",
+                entryDirectExpense: "Direct Expense",
+                entryAdvanceGiven: "Advance to Lalu",
+                entryAdvanceSettlement: "Expense from Lalu Advance",
+                payerShreyansh: "Shreyansh",
+                payerRajesh: "Rajesh",
+                advancePartyLalu: "Lalu",
                 categoryMaterial: "Material",
                 categoryContractor: "Contractor",
                 categoryEquipment: "Equipment",
                 categoryMiscellaneous: "Miscellaneous",
+                categoryAdvance: "Advance",
                 paymentUpi: "UPI",
                 paymentCash: "Cash",
                 paymentBankTransfer: "Bank Transfer",
@@ -824,12 +863,19 @@
                 viewProof: "View Proof",
                 noExpensesRecorded: "No expenses recorded yet.",
                 paidToPrefix: "Paid To",
+                paidByPrefix: "Paid By",
+                typePrefix: "Type",
+                advancePartyPrefix: "Advance Holder",
                 modePrefix: "Mode",
                 openBill: "Open Bill / Screenshot",
                 ownerPasswordFirst: "Enter the dashboard password first.",
                 checkingPassword: "Checking password...",
                 ownerUnlocked: "Project dashboard opened successfully.",
                 ownerSessionClosed: "Dashboard session closed.",
+                loadingContractors: "Loading contractor...",
+                hintDirectExpense: "Use this for regular payments made directly for materials, contractors, equipment, or other work.",
+                hintAdvanceGiven: "Use this when you hand over money to Lalu in advance for site work.",
+                hintAdvanceSettlement: "Use this when Lalu has already spent from that advance and you want to record the actual expense.",
                 expenseSaved: "Expense saved successfully.",
                 budgetUpdated: "Budget updated successfully.",
                 contractorSaved: "Contractor saved successfully.",
@@ -868,15 +914,19 @@
                 totalSpent: "कुल खर्च",
                 paidToContractors: "कार्य भुगतान",
                 materialSpend: "सामग्री खर्च",
+                laluAdvanceBalance: "लालू एडवांस बैलेंस",
                 recentExpensesTitle: "हाल के खर्च",
                 addExpenseTitle: "खर्च जोड़ें",
                 addExpenseDescription: "इस फॉर्म का उपयोग ठेकेदार भुगतान और अन्य निर्माण खर्च दर्ज करने के लिए करें।",
                 labelDate: "तारीख",
+                labelEntryKind: "एंट्री प्रकार",
+                labelPaidBy: "किसने भुगतान किया",
                 labelCategory: "श्रेणी",
                 labelAmount: "राशि",
                 labelPaymentMode: "भुगतान का तरीका",
                 labelDescription: "विवरण",
                 labelPaidTo: "किसे भुगतान",
+                labelAdvanceParty: "एडवांस किसके पास है",
                 labelScreenshot: "बिल / स्क्रीनशॉट",
                 saveExpense: "खर्च सेव करें",
                 clearForm: "फॉर्म साफ करें",
@@ -892,10 +942,17 @@
                 contractorFieldAgreedAmount: "तय राशि",
                 saveContractor: "ठेकेदार सेव करें",
                 settingsNote: "इस पेज से कुल बजट और ठेकेदार सूची को प्रबंधित करें।",
+                entryDirectExpense: "सीधा खर्च",
+                entryAdvanceGiven: "लालू को एडवांस",
+                entryAdvanceSettlement: "लालू के एडवांस से खर्च",
+                payerShreyansh: "Shreyansh",
+                payerRajesh: "Rajesh",
+                advancePartyLalu: "Lalu",
                 categoryMaterial: "सामग्री",
                 categoryContractor: "ठेकेदार",
                 categoryEquipment: "उपकरण",
                 categoryMiscellaneous: "विविध",
+                categoryAdvance: "एडवांस",
                 paymentUpi: "यूपीआई",
                 paymentCash: "नकद",
                 paymentBankTransfer: "बैंक ट्रांसफर",
@@ -917,12 +974,19 @@
                 viewProof: "प्रूफ देखें",
                 noExpensesRecorded: "अभी तक कोई खर्च दर्ज नहीं है।",
                 paidToPrefix: "किसे भुगतान",
+                paidByPrefix: "किसने भुगतान किया",
+                typePrefix: "प्रकार",
+                advancePartyPrefix: "एडवांस किसके पास है",
                 modePrefix: "तरीका",
                 openBill: "बिल / स्क्रीनशॉट खोलें",
                 ownerPasswordFirst: "पहले डैशबोर्ड पासवर्ड दर्ज करें।",
                 checkingPassword: "पासवर्ड जांचा जा रहा है...",
                 ownerUnlocked: "प्रोजेक्ट डैशबोर्ड सफलतापूर्वक खुल गया।",
                 ownerSessionClosed: "डैशबोर्ड सत्र बंद कर दिया गया।",
+                loadingContractors: "ठेकेदार लोड हो रहा है...",
+                hintDirectExpense: "सामग्री, ठेकेदार, उपकरण या अन्य काम के लिए किए गए सामान्य भुगतान के लिए इसका उपयोग करें।",
+                hintAdvanceGiven: "जब आप साइट के काम के लिए लालू को पहले से पैसे देते हैं, तब इसका उपयोग करें।",
+                hintAdvanceSettlement: "जब लालू उसी एडवांस में से खर्च कर चुका हो और आप वास्तविक खर्च दर्ज करना चाहते हों, तब इसका उपयोग करें।",
                 expenseSaved: "खर्च सफलतापूर्वक सेव हो गया।",
                 budgetUpdated: "बजट सफलतापूर्वक अपडेट हो गया।",
                 contractorSaved: "ठेकेदार सफलतापूर्वक सेव हो गया।",
@@ -939,13 +1003,17 @@
                 totalBudget: 0,
                 total: 0,
                 Contractor: 0,
-                Material: 0
+                Material: 0,
+                Equipment: 0,
+                Miscellaneous: 0,
+                laluAdvanceBalance: 0
             },
             recentExpenses: [],
             historyExpenses: [],
             currentLang: "en",
             route: "home",
-            ownerLoginMessage: null
+            ownerLoginMessage: null,
+            contractorsLoading: false
         };
 
         const currency = new Intl.NumberFormat("en-IN", {
@@ -1102,14 +1170,24 @@
         function renderContractorSelects() {
             const select = byId("contractorSelect");
             const selectedValue = select.value;
+            if (state.contractorsLoading && !state.contractors.length) {
+                select.innerHTML = `<option value="">${escapeHtml(t("loadingContractors"))}</option>`;
+                select.disabled = true;
+                renderPaidToInput();
+                return;
+            }
+
             const contractorOptions = state.contractors
                 .map((contractor) => `<option value="${escapeHtml(contractor.Name)}">${escapeHtml(contractor.Name)}</option>`)
                 .join("");
 
             select.innerHTML = contractorOptions || `<option value="">${escapeHtml(t("noContractorsFound"))}</option>`;
+            select.disabled = !state.contractors.length;
 
             if (selectedValue && state.contractors.some((contractor) => contractor.Name === selectedValue)) {
                 select.value = selectedValue;
+            } else if (state.contractors.length === 1) {
+                select.value = state.contractors[0].Name;
             }
 
             renderPaidToInput();
@@ -1122,17 +1200,85 @@
                 totalBudget: data.totalBudget || 0,
                 total: summary.total || 0,
                 Contractor: summary.Contractor || 0,
-                Material: summary.Material || 0
+                Material: summary.Material || 0,
+                Equipment: summary.Equipment || 0,
+                Miscellaneous: summary.Miscellaneous || 0,
+                laluAdvanceBalance: data.laluAdvanceBalance || 0
             };
             state.recentExpenses = Array.isArray(data.recentExpenses) ? data.recentExpenses : [];
             renderDashboard();
         }
 
+        function getCategoryLabel(category) {
+            const labels = {
+                Material: t("categoryMaterial"),
+                Contractor: t("categoryContractor"),
+                Equipment: t("categoryEquipment"),
+                Miscellaneous: t("categoryMiscellaneous"),
+                Advance: t("categoryAdvance")
+            };
+
+            return labels[category] || category || "-";
+        }
+
+        function getEntryKindLabel(entryKind) {
+            const labels = {
+                DirectExpense: t("entryDirectExpense"),
+                AdvanceGiven: t("entryAdvanceGiven"),
+                AdvanceSettlement: t("entryAdvanceSettlement")
+            };
+
+            return labels[entryKind] || t("entryDirectExpense");
+        }
+
+        function syncExpenseFormState() {
+            const entryKind = byId("expenseEntryKind").value;
+            const categorySelect = byId("expenseCategory");
+            const advancePartyGroup = byId("advancePartyGroup");
+
+            if (entryKind === "AdvanceGiven") {
+                advancePartyGroup.classList.remove("hidden");
+                byId("expenseAdvanceParty").value = "Lalu";
+                categorySelect.value = "Advance";
+                categorySelect.disabled = true;
+                byId("expenseFlowHint").textContent = t("hintAdvanceGiven");
+            } else {
+                advancePartyGroup.classList.toggle("hidden", entryKind !== "AdvanceSettlement");
+                categorySelect.disabled = false;
+
+                if (categorySelect.value === "Advance") {
+                    categorySelect.value = "Material";
+                }
+
+                byId("expenseFlowHint").textContent = entryKind === "AdvanceSettlement"
+                    ? t("hintAdvanceSettlement")
+                    : t("hintDirectExpense");
+            }
+
+            renderPaidToInput();
+        }
+
         function renderPaidToInput() {
+            const entryKind = byId("expenseEntryKind").value;
             const category = byId("expenseCategory").value;
             const container = byId("paidToContainer");
             const existingField = byId("expensePaidTo");
             const existingValue = existingField ? existingField.value : "";
+
+            if (entryKind === "AdvanceGiven") {
+                const advanceParty = byId("expenseAdvanceParty").value || "Lalu";
+                container.innerHTML = `<input id="expensePaidTo" type="text" value="${escapeHtml(advanceParty)}" readonly required />`;
+                return;
+            }
+
+            if (category === "Contractor" && state.contractorsLoading && !state.contractors.length) {
+                container.innerHTML = `
+                    <select id="expensePaidTo" required disabled>
+                        <option value="">${escapeHtml(t("loadingContractors"))}</option>
+                    </select>
+                `;
+                return;
+            }
 
             if (category === "Contractor" && state.contractors.length > 0) {
                 container.innerHTML = `
@@ -1141,8 +1287,10 @@
                     </select>
                 `;
 
-                if (existingValue) {
+                if (existingValue && state.contractors.some((contractor) => contractor.Name === existingValue)) {
                     byId("expensePaidTo").value = existingValue;
+                } else if (state.contractors.length === 1) {
+                    byId("expensePaidTo").value = state.contractors[0].Name;
                 }
                 return;
             }
@@ -1172,14 +1320,18 @@
             byId("spentValue").textContent = formatMoney(state.summary.total || 0);
             byId("contractorSpentValue").textContent = formatMoney(state.summary.Contractor || 0);
             byId("materialSpentValue").textContent = formatMoney(state.summary.Material || 0);
+            byId("laluAdvanceBalanceValue").textContent = formatMoney(state.summary.laluAdvanceBalance || 0);
             byId("totalBudgetInput").value = Number(state.summary.totalBudget || 0);
 
             byId("recentExpensesBody").innerHTML = state.recentExpenses.length
                 ? state.recentExpenses.map((expense) => `
                     <tr>
                         <td>${escapeHtml(expense.Date)}</td>
-                        <td>${escapeHtml(expense.Category)}</td>
-                        <td>${escapeHtml(expense.Description)}</td>
+                        <td>${escapeHtml(getCategoryLabel(expense.Category))}</td>
+                        <td>
+                            <div>${escapeHtml(expense.Description)}</div>
+                            <div class="muted" style="margin-top: 6px;">${escapeHtml(t("typePrefix"))}: ${escapeHtml(getEntryKindLabel(expense.EntryKind))} · ${escapeHtml(t("paidByPrefix"))}: ${escapeHtml(expense.PaidBy || "-")}</div>
+                        </td>
                         <td>${escapeHtml(expense.PaidTo)}</td>
                         <td>${formatMoney(expense.Amount)}</td>
                     </tr>
@@ -1191,9 +1343,14 @@
             byId("historyList").innerHTML = state.historyExpenses.length
                 ? state.historyExpenses.map((expense) => `
                     <article class="history-item">
-                        <strong>${escapeHtml(expense.Date)} · ${escapeHtml(expense.Category)} · ${formatMoney(expense.Amount)}</strong>
+                        <strong>${escapeHtml(expense.Date)} · ${escapeHtml(getCategoryLabel(expense.Category))} · ${formatMoney(expense.Amount)}</strong>
                         <div>${escapeHtml(expense.Description)}</div>
-                        <div class="muted" style="margin-top: 8px;">${escapeHtml(t("paidToPrefix"))}: ${escapeHtml(expense.PaidTo)} · ${escapeHtml(t("modePrefix"))}: ${escapeHtml(expense.PaymentMode)}</div>
+                        <div class="muted" style="margin-top: 8px;">
+                            ${escapeHtml(t("paidToPrefix"))}: ${escapeHtml(expense.PaidTo || "-")} ·
+                            ${escapeHtml(t("paidByPrefix"))}: ${escapeHtml(expense.PaidBy || "-")} ·
+                            ${escapeHtml(t("typePrefix"))}: ${escapeHtml(getEntryKindLabel(expense.EntryKind))}${expense.AdvanceParty ? ` · ${escapeHtml(t("advancePartyPrefix"))}: ${escapeHtml(expense.AdvanceParty)}` : ""} ·
+                            ${escapeHtml(t("modePrefix"))}: ${escapeHtml(expense.PaymentMode)}
+                        </div>
                         ${expense.ScreenshotUrl ? `<div style="margin-top: 10px;"><a href="${expense.ScreenshotUrl}" target="_blank" rel="noreferrer">${escapeHtml(t("openBill"))}</a></div>` : ""}
                     </article>
                 `).join("")
@@ -1204,6 +1361,7 @@
             updateStaticTranslations();
             renderOwnerLoginMessage();
             renderContractorSelects();
+            syncExpenseFormState();
             renderContractorPayments();
             renderDashboard();
             renderHistory();
@@ -1229,8 +1387,11 @@
 
         function clearExpenseForm() {
             byId("expenseForm").reset();
+            byId("expenseEntryKind").value = "DirectExpense";
+            byId("expensePaidBy").value = "Shreyansh";
+            byId("expenseAdvanceParty").value = "Lalu";
             setToday();
-            renderPaidToInput();
+            syncExpenseFormState();
         }
 
         function logoutOwner() {
@@ -1249,23 +1410,29 @@
         }
 
         async function loadContractors() {
+            state.contractorsLoading = true;
+            renderContractorSelects();
+
             try {
                 const data = await apiGet("getContractors", { secret: CONFIG.PUBLIC_TOKEN });
                 state.contractors = Array.isArray(data.contractors) ? data.contractors : [];
-                renderContractorSelects();
-                renderContractorPayments();
-
-                if (!state.contractors.length) {
-                    showBanner(t("noContractorsAddedYet"), "info");
-                    return;
-                }
-
-                if (state.contractors.length === 1) {
-                    byId("contractorSelect").value = state.contractors[0].Name;
-                    await loadContractorPayments();
-                }
             } catch (error) {
                 showBanner(error.message, "error");
+                return;
+            } finally {
+                state.contractorsLoading = false;
+                renderContractorSelects();
+                renderContractorPayments();
+            }
+
+            if (!state.contractors.length) {
+                showBanner(t("noContractorsAddedYet"), "info");
+                return;
+            }
+
+            if (state.contractors.length === 1) {
+                byId("contractorSelect").value = state.contractors[0].Name;
+                await loadContractorPayments();
             }
         }
 
@@ -1317,9 +1484,16 @@
         }
 
         async function loadOwnerContractors() {
-            const data = await apiGet("getContractors", { secret: state.ownerSecret });
-            state.contractors = Array.isArray(data.contractors) ? data.contractors : [];
+            state.contractorsLoading = true;
             renderContractorSelects();
+
+            try {
+                const data = await apiGet("getContractors", { secret: state.ownerSecret });
+                state.contractors = Array.isArray(data.contractors) ? data.contractors : [];
+            } finally {
+                state.contractorsLoading = false;
+                renderContractorSelects();
+            }
         }
 
         async function loadDashboard() {
@@ -1339,6 +1513,9 @@
             const saveButton = byId("saveExpenseBtn");
             saveButton.disabled = true;
             saveButton.textContent = state.currentLang === "en" ? "Saving..." : "सेव हो रहा है...";
+
+            const entryKind = byId("expenseEntryKind").value;
+            const advanceParty = entryKind === "DirectExpense" ? "" : byId("expenseAdvanceParty").value;
 
             try {
                 let screenshotUrl = "";
@@ -1363,13 +1540,15 @@
                     amount: byId("expenseAmount").value,
                     paymentMode: byId("expensePaymentMode").value,
                     paidTo: byId("expensePaidTo").value.trim(),
-                    screenshotUrl
+                    screenshotUrl,
+                    paidBy: byId("expensePaidBy").value,
+                    entryKind,
+                    advanceParty
                 });
 
                 clearExpenseForm();
-                await refreshOwnerData();
-                switchTab("dashboard");
                 showBanner(t("expenseSaved"), "success");
+                Promise.allSettled([loadDashboard(), loadHistory()]);
             } catch (error) {
                 showBanner(error.message, "error");
             } finally {
@@ -1444,8 +1623,7 @@
             byId("budgetForm").addEventListener("submit", saveBudget);
             byId("contractorForm").addEventListener("submit", saveContractor);
 
-            setToday();
-            renderPaidToInput();
+            clearExpenseForm();
             renderRoute();
 
             if (state.route === "contractor") {
