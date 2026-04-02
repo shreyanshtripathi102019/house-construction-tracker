@@ -8,6 +8,8 @@ const SETTINGS_KEYS = {
   TOTAL_BUDGET: 'TOTAL_BUDGET'
 };
 
+const PROJECT_TITLE = 'House Construction Tracker Final';
+
 const ENTRY_KINDS = {
   DIRECT_EXPENSE: 'DirectExpense',
   ADVANCE_GIVEN: 'AdvanceGiven',
@@ -58,17 +60,11 @@ function bootstrapProject() {
   const spreadsheet = getSpreadsheet_();
   ensureStructure_(spreadsheet);
 
-  const properties = PropertiesService.getScriptProperties();
-
-  if (!properties.getProperty('OWNER_PASSWORD')) {
-    properties.setProperty('OWNER_PASSWORD', 'ChangeThisPassword123');
-  }
-
   return {
     success: true,
     spreadsheetId: spreadsheet.getId(),
     spreadsheetUrl: spreadsheet.getUrl(),
-    ownerPassword: properties.getProperty('OWNER_PASSWORD')
+    ownerPasswordConfigured: isOwnerPasswordConfigured_()
   };
 }
 
@@ -76,7 +72,7 @@ function configureTracker(ownerPassword, uploadFolderId) {
   const properties = PropertiesService.getScriptProperties();
 
   if (ownerPassword) {
-    properties.setProperty('OWNER_PASSWORD', ownerPassword);
+    properties.setProperty('OWNER_PASSWORD', String(ownerPassword).trim());
   }
 
   if (uploadFolderId) {
@@ -314,7 +310,7 @@ function getSpreadsheet_() {
     spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
 
     if (!spreadsheet) {
-      spreadsheet = SpreadsheetApp.create('House Construction Tracker');
+      spreadsheet = SpreadsheetApp.create(PROJECT_TITLE);
     }
 
     spreadsheetId = spreadsheet.getId();
@@ -333,6 +329,7 @@ function ensureStructure_(spreadsheet) {
   settingsSheet.setFrozenRows(1);
   contractorsSheet.setFrozenRows(1);
   expensesSheet.setFrozenRows(1);
+  applyExpenseSheetValidations_(expensesSheet);
 
   const settings = readSettingsMapFromSheet_(settingsSheet);
 
@@ -358,6 +355,33 @@ function ensureSheet_(spreadsheet, name, headers) {
   }
 
   return sheet;
+}
+
+function applyExpenseSheetValidations_(sheet) {
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  const maxRows = Math.max(sheet.getMaxRows() - 1, 1);
+  const rulesByHeader = {
+    Category: ['Material', 'Contractor', 'Equipment', 'Miscellaneous', 'Advance'],
+    PaymentMode: ['UPI', 'Cash', 'Bank Transfer', 'Cheque'],
+    PaidBy: ['Shreyansh', 'Rajesh'],
+    EntryKind: [ENTRY_KINDS.DIRECT_EXPENSE, ENTRY_KINDS.ADVANCE_GIVEN, ENTRY_KINDS.ADVANCE_SETTLEMENT],
+    AdvanceParty: ['Lalu']
+  };
+
+  Object.keys(rulesByHeader).forEach(function(header) {
+    const columnIndex = headers.indexOf(header);
+
+    if (columnIndex === -1) {
+      return;
+    }
+
+    const rule = SpreadsheetApp.newDataValidation()
+      .requireValueInList(rulesByHeader[header], true)
+      .setAllowInvalid(true)
+      .build();
+
+    sheet.getRange(2, columnIndex + 1, maxRows, 1).setDataValidation(rule);
+  });
 }
 
 function readSettingsMap_(spreadsheet) {
@@ -435,6 +459,10 @@ function getAllExpenses_() {
 
 function getAdvanceParty_(expense) {
   return String(expense.AdvanceParty || expense.PaidTo || '').trim();
+}
+
+function isOwnerPasswordConfigured_() {
+  return !!PropertiesService.getScriptProperties().getProperty('OWNER_PASSWORD');
 }
 
 function sortExpensesDesc_(expenses) {

@@ -29,7 +29,7 @@ Your job is to complete the entire setup end to end, hands-free:
    - Apps Script web app URL
    - Spreadsheet URL
    - Drive folder URL
-   - Owner password
+   - Confirmation that the owner password is stored only in Apps Script Script Properties and nowhere in GitHub, the UI, or public output
    - Short summary of what you changed
 
 Important rules:
@@ -38,6 +38,7 @@ Important rules:
 - Do not leave placeholder values unresolved.
 - Do not ask me follow-up questions unless something is truly impossible.
 - If any deployment step fails, fix it and continue until the website is working.
+- Do not print, commit, or return the actual owner password in chat, GitHub, the frontend, or any generated file.
 - Keep the UI simple, clean, and mobile-friendly.
 - Preserve the contractor view plus owner dashboard structure from the provided `index.html`.
 

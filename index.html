@@ -1466,7 +1466,7 @@
             setOwnerLoginMessage("checkingPassword");
 
             try {
-                const summaryData = await apiGet("getSummary", { secret: password });
+                const summaryData = await apiPost("getSummary", { secret: password });
                 state.ownerSecret = password;
                 applySummaryData(summaryData);
                 setOwnerLoginMessage(null);
@@ -1488,7 +1488,7 @@
             renderContractorSelects();
 
             try {
-                const data = await apiGet("getContractors", { secret: state.ownerSecret });
+                const data = await apiPost("getContractors", { secret: state.ownerSecret });
                 state.contractors = Array.isArray(data.contractors) ? data.contractors : [];
             } finally {
                 state.contractorsLoading = false;
@@ -1497,12 +1497,12 @@
         }
 
         async function loadDashboard() {
-            const data = await apiGet("getSummary", { secret: state.ownerSecret });
+            const data = await apiPost("getSummary", { secret: state.ownerSecret });
             applySummaryData(data);
         }
 
         async function loadHistory() {
-            const data = await apiGet("getExpenses", { secret: state.ownerSecret });
+            const data = await apiPost("getExpenses", { secret: state.ownerSecret });
             state.historyExpenses = Array.isArray(data.expenses) ? data.expenses : [];
             renderHistory();
         }
