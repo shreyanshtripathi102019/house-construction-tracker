@@ -16,7 +16,6 @@
             --border: #e8d9c9;
             --success: #1f7a50;
             --danger: #b33c2f;
-            
             --shadow: 0 20px 50px rgba(88, 55, 24, 0.08);
         }
 
@@ -34,10 +33,42 @@
                 var(--bg);
         }
 
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
         .container {
             width: min(1120px, calc(100% - 32px));
             margin: 0 auto;
-            padding: 32px 0 56px;
+            padding: 24px 0 56px;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .brand-link {
+            font-weight: 800;
+            font-size: 18px;
+            letter-spacing: 0.01em;
+            color: var(--accent-dark);
+        }
+
+        .lang-toggle {
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.85);
+            color: var(--accent-dark);
+            border-radius: 999px;
+            padding: 10px 14px;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: var(--shadow);
         }
 
         .hero {
@@ -68,7 +99,7 @@
 
         .hero p {
             margin: 0;
-            max-width: 720px;
+            max-width: 760px;
             color: rgba(255, 255, 255, 0.86);
             font-size: 17px;
             line-height: 1.6;
@@ -223,6 +254,9 @@
 
         .btn,
         .secondary-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             padding: 12px 16px;
             font-weight: 700;
         }
@@ -233,7 +267,8 @@
         }
 
         .btn:hover,
-        .tab-btn:hover {
+        .tab-btn:hover,
+        .secondary-btn:hover {
             transform: translateY(-1px);
         }
 
@@ -367,7 +402,13 @@
         @media (max-width: 720px) {
             .container {
                 width: min(100% - 20px, 1120px);
-                padding-top: 20px;
+                padding-top: 18px;
+            }
+
+            .topbar,
+            .panel-title-row {
+                align-items: flex-start;
+                flex-direction: column;
             }
 
             .hero,
@@ -376,65 +417,78 @@
                 border-radius: 22px;
             }
 
-            .panel-title-row {
-                align-items: flex-start;
-                flex-direction: column;
+            .owner-nav {
+                width: 100%;
+            }
+
+            .tab-btn {
+                flex: 1 1 calc(50% - 10px);
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header class="hero">
-            <div class="eyebrow">House Construction Tracker</div>
-            <h1>Keep owner payments and contractor receipts in sync.</h1>
-            <p>
-                One clean page for the owner dashboard and one public contractor view to confirm how much has been paid,
-                received, and recorded with bill proof.
+        <div class="topbar">
+            <a class="brand-link" href="index.html" data-i18n="brandShort">House Construction Tracker</a>
+            <button id="languageToggle" class="lang-toggle" type="button" onclick="toggleLanguage()">हिंदी</button>
+        </div>
+
+        <div id="banner" class="banner info hidden"></div>
+
+        <section id="homeView" class="hero">
+            <div class="eyebrow" data-i18n="homeEyebrow">House Construction Tracker</div>
+            <h1 data-i18n="homeTitle">Keep owner payments and contractor receipts in sync.</h1>
+            <p data-i18n="homeDescription">
+                One clear home screen with separate page-style views for the contractor and the owner dashboard.
             </p>
 
             <div class="mode-grid">
                 <div class="mode-card">
-                    <h2>Contractor View</h2>
-                    <p>Choose a contractor name and see every recorded payment with amount, mode, and proof link.</p>
-                    <button class="btn" type="button" onclick="openContractorView()">Open Contractor View</button>
+                    <h2 data-i18n="contractorCardTitle">Contractor View</h2>
+                    <p data-i18n="contractorCardDescription">
+                        Open a dedicated contractor page to see recorded payments, received amount, and proof links.
+                    </p>
+                    <a class="btn" href="?view=contractor" data-i18n="contractorCardButton">Open Contractor Page</a>
                 </div>
 
                 <div class="mode-card">
-                    <h2>Owner Dashboard</h2>
-                    <p>Log in with the owner password to add expenses, manage contractors, update budget, and review history.</p>
-                    <button class="btn" type="button" onclick="openOwnerLogin()">Open Owner Login</button>
+                    <h2 data-i18n="ownerCardTitle">Owner Dashboard</h2>
+                    <p data-i18n="ownerCardDescription">
+                        Open a dedicated owner page to log in, add expenses, manage contractors, and review history.
+                    </p>
+                    <a class="btn" href="?view=owner" data-i18n="ownerCardButton">Open Owner Page</a>
                 </div>
             </div>
-        </header>
+        </section>
 
         <div class="shell">
-            <div id="banner" class="banner info hidden"></div>
-
             <section id="contractorView" class="panel hidden">
                 <div class="panel-title-row">
                     <div>
-                        <h2>Contractor Payments</h2>
-                        <p class="panel-copy">Pick a contractor to see how much has been paid and the proof saved by the owner.</p>
+                        <h2 data-i18n="contractorPageTitle">Contractor Payments</h2>
+                        <p class="panel-copy" data-i18n="contractorPageDescription">
+                            Select your name and see how much payment has been recorded with proof.
+                        </p>
                     </div>
-                    <button class="secondary-btn" type="button" onclick="hideSections()">Back to Home</button>
+                    <a class="secondary-btn" href="index.html" data-i18n="backHome">Back to Home</a>
                 </div>
 
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="contractorSelect">Contractor Name</label>
+                        <label for="contractorSelect" data-i18n="contractorNameLabel">Contractor Name</label>
                         <select id="contractorSelect"></select>
                     </div>
                     <div class="form-group">
                         <label>&nbsp;</label>
-                        <button class="btn" type="button" onclick="loadContractorPayments()">Load Payments</button>
+                        <button class="btn" type="button" onclick="loadContractorPayments()" data-i18n="loadPayments">Load Payments</button>
                     </div>
                 </div>
 
                 <div class="grid kpi-grid" style="margin-top: 18px;">
                     <div class="stats-card accent">
-                        <div class="label">Total Received</div>
-                        <div class="value" id="contractorTotalPaid">Rs 0</div>
+                        <div class="label" data-i18n="totalReceived">Total Received</div>
+                        <div class="value" id="contractorTotalPaid">₹0</div>
                     </div>
                 </div>
 
@@ -442,11 +496,11 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Date</th>
-                                <th>Description</th>
-                                <th>Amount</th>
-                                <th>Mode</th>
-                                <th>Proof</th>
+                                <th data-i18n="tableDate">Date</th>
+                                <th data-i18n="tableDescription">Description</th>
+                                <th data-i18n="tableAmount">Amount</th>
+                                <th data-i18n="tableMode">Mode</th>
+                                <th data-i18n="tableProof">Proof</th>
                             </tr>
                         </thead>
                         <tbody id="contractorPaymentsBody"></tbody>
@@ -457,20 +511,20 @@
             <section id="ownerLoginView" class="panel hidden">
                 <div class="panel-title-row">
                     <div>
-                        <h2>Owner Login</h2>
-                        <p class="panel-copy">Enter the password configured in the Apps Script project.</p>
+                        <h2 data-i18n="ownerLoginTitle">Owner Login</h2>
+                        <p class="panel-copy" data-i18n="ownerLoginDescription">Enter the owner password to open the dashboard.</p>
                     </div>
-                    <button class="secondary-btn" type="button" onclick="hideSections()">Back to Home</button>
+                    <a class="secondary-btn" href="index.html" data-i18n="backHome">Back to Home</a>
                 </div>
 
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="ownerPassword">Owner Password</label>
-                        <input id="ownerPassword" type="password" placeholder="Enter password" />
+                        <label for="ownerPassword" data-i18n="ownerPasswordLabel">Owner Password</label>
+                        <input id="ownerPassword" type="password" data-i18n-placeholder="ownerPasswordPlaceholder" placeholder="Enter password" />
                     </div>
                     <div class="form-group">
                         <label>&nbsp;</label>
-                        <button class="btn" type="button" onclick="loginOwner()">Unlock Dashboard</button>
+                        <button class="btn" type="button" onclick="loginOwner()" data-i18n="unlockDashboard">Unlock Dashboard</button>
                     </div>
                 </div>
                 <p id="ownerLoginMessage" class="footer-note"></p>
@@ -480,53 +534,55 @@
                 <div class="panel">
                     <div class="panel-title-row">
                         <div>
-                            <h2>Owner Dashboard</h2>
-                            <p class="panel-copy">Track total budget, payments to contractors, material spending, and every expense entry.</p>
+                            <h2 data-i18n="ownerDashboardTitle">Owner Dashboard</h2>
+                            <p class="panel-copy" data-i18n="ownerDashboardDescription">
+                                Track budget, contractor payments, material spending, and all saved expenses.
+                            </p>
                         </div>
-                        <button class="secondary-btn" type="button" onclick="logoutOwner()">Log Out</button>
+                        <button class="secondary-btn" type="button" onclick="logoutOwner()" data-i18n="logout">Log Out</button>
                     </div>
 
                     <div class="owner-nav">
-                        <button id="tabDashboardBtn" class="tab-btn active" type="button" onclick="switchTab('dashboard')">Dashboard</button>
-                        <button id="tabAddExpenseBtn" class="tab-btn" type="button" onclick="switchTab('addExpense')">Add Expense</button>
-                        <button id="tabHistoryBtn" class="tab-btn" type="button" onclick="switchTab('history')">History</button>
-                        <button id="tabSettingsBtn" class="tab-btn" type="button" onclick="switchTab('settings')">Settings</button>
+                        <button id="tabDashboardBtn" class="tab-btn active" type="button" onclick="switchTab('dashboard')" data-i18n="tabDashboard">Dashboard</button>
+                        <button id="tabAddExpenseBtn" class="tab-btn" type="button" onclick="switchTab('addExpense')" data-i18n="tabAddExpense">Add Expense</button>
+                        <button id="tabHistoryBtn" class="tab-btn" type="button" onclick="switchTab('history')" data-i18n="tabHistory">History</button>
+                        <button id="tabSettingsBtn" class="tab-btn" type="button" onclick="switchTab('settings')" data-i18n="tabSettings">Settings</button>
                     </div>
                 </div>
 
                 <section id="dashboardTab" class="panel tab-panel active">
                     <div class="grid kpi-grid">
                         <div class="stats-card accent">
-                            <div class="label">Total Budget</div>
-                            <div class="value" id="budgetValue">Rs 0</div>
+                            <div class="label" data-i18n="totalBudget">Total Budget</div>
+                            <div class="value" id="budgetValue">₹0</div>
                         </div>
                         <div class="stats-card">
-                            <div class="label">Total Spent</div>
-                            <div class="value" id="spentValue">Rs 0</div>
+                            <div class="label" data-i18n="totalSpent">Total Spent</div>
+                            <div class="value" id="spentValue">₹0</div>
                         </div>
                         <div class="stats-card">
-                            <div class="label">Paid To Contractors</div>
-                            <div class="value" id="contractorSpentValue">Rs 0</div>
+                            <div class="label" data-i18n="paidToContractors">Paid To Contractors</div>
+                            <div class="value" id="contractorSpentValue">₹0</div>
                         </div>
                         <div class="stats-card">
-                            <div class="label">Material Spend</div>
-                            <div class="value" id="materialSpentValue">Rs 0</div>
+                            <div class="label" data-i18n="materialSpend">Material Spend</div>
+                            <div class="value" id="materialSpentValue">₹0</div>
                         </div>
                     </div>
 
                     <div class="panel" style="margin-top: 18px; padding: 20px;">
                         <div class="panel-title-row" style="margin-bottom: 12px;">
-                            <h3>Recent Expenses</h3>
+                            <h3 data-i18n="recentExpensesTitle">Recent Expenses</h3>
                         </div>
                         <div class="table-wrap">
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Date</th>
-                                        <th>Category</th>
-                                        <th>Description</th>
-                                        <th>Paid To</th>
-                                        <th>Amount</th>
+                                        <th data-i18n="tableDate">Date</th>
+                                        <th data-i18n="tableCategory">Category</th>
+                                        <th data-i18n="tableDescription">Description</th>
+                                        <th data-i18n="tablePaidTo">Paid To</th>
+                                        <th data-i18n="tableAmount">Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody id="recentExpensesBody"></tbody>
@@ -538,58 +594,60 @@
                 <section id="addExpenseTab" class="panel tab-panel">
                     <div class="panel-title-row">
                         <div>
-                            <h3>Add Expense</h3>
-                            <p class="panel-copy">Use this form for both contractor payments and material or equipment purchases.</p>
+                            <h3 data-i18n="addExpenseTitle">Add Expense</h3>
+                            <p class="panel-copy" data-i18n="addExpenseDescription">
+                                Use this form for contractor payments and other construction expenses.
+                            </p>
                         </div>
                     </div>
 
                     <form id="expenseForm" class="grid">
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="expenseDate">Date</label>
+                                <label for="expenseDate" data-i18n="labelDate">Date</label>
                                 <input id="expenseDate" type="date" required />
                             </div>
                             <div class="form-group">
-                                <label for="expenseCategory">Category</label>
+                                <label for="expenseCategory" data-i18n="labelCategory">Category</label>
                                 <select id="expenseCategory" required onchange="renderPaidToInput()">
-                                    <option value="Material">Material</option>
-                                    <option value="Contractor">Contractor</option>
-                                    <option value="Equipment">Equipment</option>
-                                    <option value="Miscellaneous">Miscellaneous</option>
+                                    <option value="Material" data-i18n="categoryMaterial">Material</option>
+                                    <option value="Contractor" data-i18n="categoryContractor">Contractor</option>
+                                    <option value="Equipment" data-i18n="categoryEquipment">Equipment</option>
+                                    <option value="Miscellaneous" data-i18n="categoryMiscellaneous">Miscellaneous</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="expenseAmount">Amount</label>
+                                <label for="expenseAmount" data-i18n="labelAmount">Amount</label>
                                 <input id="expenseAmount" type="number" min="0" step="0.01" required />
                             </div>
                             <div class="form-group">
-                                <label for="expensePaymentMode">Payment Mode</label>
+                                <label for="expensePaymentMode" data-i18n="labelPaymentMode">Payment Mode</label>
                                 <select id="expensePaymentMode" required>
-                                    <option value="UPI">UPI</option>
-                                    <option value="Cash">Cash</option>
-                                    <option value="Bank Transfer">Bank Transfer</option>
-                                    <option value="Cheque">Cheque</option>
+                                    <option value="UPI" data-i18n="paymentUpi">UPI</option>
+                                    <option value="Cash" data-i18n="paymentCash">Cash</option>
+                                    <option value="Bank Transfer" data-i18n="paymentBankTransfer">Bank Transfer</option>
+                                    <option value="Cheque" data-i18n="paymentCheque">Cheque</option>
                                 </select>
                             </div>
                             <div class="form-group full">
-                                <label for="expenseDescription">Description</label>
-                                <textarea id="expenseDescription" placeholder="Example: Cement bags, shuttering labour, plumbing advance" required></textarea>
+                                <label for="expenseDescription" data-i18n="labelDescription">Description</label>
+                                <textarea id="expenseDescription" data-i18n-placeholder="expenseDescriptionPlaceholder" placeholder="Example: Cement bags, shuttering labour, plumbing advance" required></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="paidToContainer">Paid To</label>
+                                <label for="paidToContainer" data-i18n="labelPaidTo">Paid To</label>
                                 <div id="paidToContainer">
-                                    <input id="expensePaidTo" type="text" placeholder="Enter vendor or contractor name" required />
+                                    <input id="expensePaidTo" type="text" data-i18n-placeholder="paidToPlaceholder" placeholder="Enter vendor or contractor name" required />
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="expenseScreenshot">Bill / Screenshot</label>
+                                <label for="expenseScreenshot" data-i18n="labelScreenshot">Bill / Screenshot</label>
                                 <input id="expenseScreenshot" type="file" accept="image/*" />
                             </div>
                         </div>
 
                         <div class="inline-actions">
-                            <button id="saveExpenseBtn" class="btn" type="submit">Save Expense</button>
-                            <button class="secondary-btn" type="button" onclick="document.getElementById('expenseForm').reset(); renderPaidToInput();">Clear Form</button>
+                            <button id="saveExpenseBtn" class="btn" type="submit" data-i18n="saveExpense">Save Expense</button>
+                            <button class="secondary-btn" type="button" onclick="clearExpenseForm()" data-i18n="clearForm">Clear Form</button>
                         </div>
                     </form>
                 </section>
@@ -597,8 +655,10 @@
                 <section id="historyTab" class="panel tab-panel">
                     <div class="panel-title-row">
                         <div>
-                            <h3>Expense History</h3>
-                            <p class="panel-copy">Every saved payment and purchase appears here in reverse chronological order.</p>
+                            <h3 data-i18n="historyTitle">Expense History</h3>
+                            <p class="panel-copy" data-i18n="historyDescription">
+                                Every saved payment and purchase appears here in reverse chronological order.
+                            </p>
                         </div>
                     </div>
                     <div id="historyList" class="history-list"></div>
@@ -608,42 +668,41 @@
                     <div class="form-grid">
                         <form id="budgetForm" class="panel" style="padding: 20px; margin: 0;">
                             <div class="panel-title-row" style="margin-bottom: 12px;">
-                                <h3>Set Total Budget</h3>
+                                <h3 data-i18n="settingsBudgetTitle">Set Total Budget</h3>
                             </div>
                             <div class="form-group">
-                                <label for="totalBudgetInput">Budget Amount</label>
+                                <label for="totalBudgetInput" data-i18n="settingsBudgetLabel">Budget Amount</label>
                                 <input id="totalBudgetInput" type="number" min="0" step="0.01" required />
                             </div>
-                            <button class="btn" type="submit">Save Budget</button>
+                            <button class="btn" type="submit" data-i18n="saveBudget">Save Budget</button>
                         </form>
 
                         <form id="contractorForm" class="panel" style="padding: 20px; margin: 0;">
                             <div class="panel-title-row" style="margin-bottom: 12px;">
-                                <h3>Add Contractor</h3>
+                                <h3 data-i18n="settingsContractorTitle">Add Contractor</h3>
                             </div>
                             <div class="form-group">
-                                <label for="contractorNameInput">Name</label>
+                                <label for="contractorNameInput" data-i18n="contractorFieldName">Name</label>
                                 <input id="contractorNameInput" type="text" required />
                             </div>
                             <div class="form-group">
-                                <label for="contractorPhoneInput">Phone</label>
+                                <label for="contractorPhoneInput" data-i18n="contractorFieldPhone">Phone</label>
                                 <input id="contractorPhoneInput" type="text" />
                             </div>
                             <div class="form-group">
-                                <label for="contractorWorkTypeInput">Work Type</label>
-                                <input id="contractorWorkTypeInput" type="text" placeholder="Civil, plumbing, electrical..." />
+                                <label for="contractorWorkTypeInput" data-i18n="contractorFieldWorkType">Work Type</label>
+                                <input id="contractorWorkTypeInput" type="text" data-i18n-placeholder="contractorWorkTypePlaceholder" placeholder="Civil, plumbing, electrical..." />
                             </div>
                             <div class="form-group">
-                                <label for="contractorAgreedAmountInput">Agreed Amount</label>
+                                <label for="contractorAgreedAmountInput" data-i18n="contractorFieldAgreedAmount">Agreed Amount</label>
                                 <input id="contractorAgreedAmountInput" type="number" min="0" step="0.01" />
                             </div>
-                            <button class="btn" type="submit">Save Contractor</button>
+                            <button class="btn" type="submit" data-i18n="saveContractor">Save Contractor</button>
                         </form>
                     </div>
 
-                    <p class="footer-note">
-                        Important: replace <code>https://script.google.com/macros/s/AKfycbzxyl6V3Lz2rgqEdt68yBBc2bDaT2B2EzOxrUQ08rFB5UbV15G8pgpSxCZWK2EU_IGp/exec</code> in this file after you deploy the Apps Script web app.
-                        If you skip that step, login and contractor data will not work.
+                    <p class="footer-note" data-i18n="settingsNote">
+                        Manage the master budget and contractor list from this page.
                     </p>
                 </section>
             </section>
@@ -656,9 +715,211 @@
             PUBLIC_TOKEN: "PUBLIC"
         };
 
+        const TRANSLATIONS = {
+            en: {
+                brandShort: "House Construction Tracker",
+                homeEyebrow: "House Construction Tracker",
+                homeTitle: "Keep owner payments and contractor receipts in sync.",
+                homeDescription: "One clear home screen with separate page-style views for the contractor and the owner dashboard.",
+                contractorCardTitle: "Contractor View",
+                contractorCardDescription: "Open a dedicated contractor page to see recorded payments, received amount, and proof links.",
+                contractorCardButton: "Open Contractor Page",
+                ownerCardTitle: "Owner Dashboard",
+                ownerCardDescription: "Open a dedicated owner page to log in, add expenses, manage contractors, and review history.",
+                ownerCardButton: "Open Owner Page",
+                contractorPageTitle: "Contractor Payments",
+                contractorPageDescription: "Select your name and see how much payment has been recorded with proof.",
+                contractorNameLabel: "Contractor Name",
+                loadPayments: "Load Payments",
+                totalReceived: "Total Received",
+                backHome: "Back to Home",
+                ownerLoginTitle: "Owner Login",
+                ownerLoginDescription: "Enter the owner password to open the dashboard.",
+                ownerPasswordLabel: "Owner Password",
+                ownerPasswordPlaceholder: "Enter password",
+                unlockDashboard: "Unlock Dashboard",
+                ownerDashboardTitle: "Owner Dashboard",
+                ownerDashboardDescription: "Track budget, contractor payments, material spending, and all saved expenses.",
+                logout: "Log Out",
+                tabDashboard: "Dashboard",
+                tabAddExpense: "Add Expense",
+                tabHistory: "History",
+                tabSettings: "Settings",
+                totalBudget: "Total Budget",
+                totalSpent: "Total Spent",
+                paidToContractors: "Paid To Contractors",
+                materialSpend: "Material Spend",
+                recentExpensesTitle: "Recent Expenses",
+                addExpenseTitle: "Add Expense",
+                addExpenseDescription: "Use this form for contractor payments and other construction expenses.",
+                labelDate: "Date",
+                labelCategory: "Category",
+                labelAmount: "Amount",
+                labelPaymentMode: "Payment Mode",
+                labelDescription: "Description",
+                labelPaidTo: "Paid To",
+                labelScreenshot: "Bill / Screenshot",
+                saveExpense: "Save Expense",
+                clearForm: "Clear Form",
+                historyTitle: "Expense History",
+                historyDescription: "Every saved payment and purchase appears here in reverse chronological order.",
+                settingsBudgetTitle: "Set Total Budget",
+                settingsBudgetLabel: "Budget Amount",
+                saveBudget: "Save Budget",
+                settingsContractorTitle: "Add Contractor",
+                contractorFieldName: "Name",
+                contractorFieldPhone: "Phone",
+                contractorFieldWorkType: "Work Type",
+                contractorFieldAgreedAmount: "Agreed Amount",
+                saveContractor: "Save Contractor",
+                settingsNote: "Manage the master budget and contractor list from this page.",
+                categoryMaterial: "Material",
+                categoryContractor: "Contractor",
+                categoryEquipment: "Equipment",
+                categoryMiscellaneous: "Miscellaneous",
+                paymentUpi: "UPI",
+                paymentCash: "Cash",
+                paymentBankTransfer: "Bank Transfer",
+                paymentCheque: "Cheque",
+                expenseDescriptionPlaceholder: "Example: Cement bags, shuttering labour, plumbing advance",
+                paidToPlaceholder: "Enter vendor or contractor name",
+                contractorWorkTypePlaceholder: "Civil, plumbing, electrical...",
+                tableDate: "Date",
+                tableDescription: "Description",
+                tableAmount: "Amount",
+                tableMode: "Mode",
+                tableProof: "Proof",
+                tableCategory: "Category",
+                tablePaidTo: "Paid To",
+                noContractorsFound: "No contractors found",
+                noContractorsAddedYet: "No contractors have been added yet.",
+                selectContractorFirst: "Select a contractor first.",
+                noPaymentsRecorded: "No payments recorded yet for this contractor.",
+                viewProof: "View Proof",
+                noExpensesRecorded: "No expenses recorded yet.",
+                paidToPrefix: "Paid To",
+                modePrefix: "Mode",
+                openBill: "Open Bill / Screenshot",
+                ownerPasswordFirst: "Enter the owner password first.",
+                checkingPassword: "Checking password...",
+                ownerUnlocked: "Owner dashboard unlocked successfully.",
+                ownerSessionClosed: "Owner session closed.",
+                expenseSaved: "Expense saved successfully.",
+                budgetUpdated: "Budget updated successfully.",
+                contractorSaved: "Contractor saved successfully.",
+                fileReadError: "Could not read the selected file."
+            },
+            hi: {
+                brandShort: "घर निर्माण ट्रैकर",
+                homeEyebrow: "घर निर्माण ट्रैकर",
+                homeTitle: "मालिक के भुगतान और ठेकेदार की प्राप्ति को एक ही जगह स्पष्ट रखें।",
+                homeDescription: "एक साफ होम स्क्रीन, और ठेकेदार तथा मालिक डैशबोर्ड के लिए अलग पेज जैसे दृश्य।",
+                contractorCardTitle: "ठेकेदार दृश्य",
+                contractorCardDescription: "एक अलग ठेकेदार पेज खोलें जहां दर्ज भुगतान, प्राप्त राशि और प्रूफ लिंक दिखें।",
+                contractorCardButton: "ठेकेदार पेज खोलें",
+                ownerCardTitle: "मालिक डैशबोर्ड",
+                ownerCardDescription: "एक अलग मालिक पेज खोलें जहां लॉगिन, खर्च जोड़ना, ठेकेदार प्रबंधन और हिस्ट्री देखना हो सके।",
+                ownerCardButton: "मालिक पेज खोलें",
+                contractorPageTitle: "ठेकेदार भुगतान",
+                contractorPageDescription: "अपना नाम चुनें और देखें कि कितना भुगतान प्रूफ के साथ दर्ज है।",
+                contractorNameLabel: "ठेकेदार का नाम",
+                loadPayments: "भुगतान देखें",
+                totalReceived: "कुल प्राप्त राशि",
+                backHome: "होम पर वापस जाएं",
+                ownerLoginTitle: "मालिक लॉगिन",
+                ownerLoginDescription: "डैशबोर्ड खोलने के लिए मालिक का पासवर्ड दर्ज करें।",
+                ownerPasswordLabel: "मालिक पासवर्ड",
+                ownerPasswordPlaceholder: "पासवर्ड दर्ज करें",
+                unlockDashboard: "डैशबोर्ड खोलें",
+                ownerDashboardTitle: "मालिक डैशबोर्ड",
+                ownerDashboardDescription: "बजट, ठेकेदार भुगतान, सामग्री खर्च और सभी सेव किए गए खर्च यहां देखें।",
+                logout: "लॉग आउट",
+                tabDashboard: "डैशबोर्ड",
+                tabAddExpense: "खर्च जोड़ें",
+                tabHistory: "हिस्ट्री",
+                tabSettings: "सेटिंग्स",
+                totalBudget: "कुल बजट",
+                totalSpent: "कुल खर्च",
+                paidToContractors: "ठेकेदारों को भुगतान",
+                materialSpend: "सामग्री खर्च",
+                recentExpensesTitle: "हाल के खर्च",
+                addExpenseTitle: "खर्च जोड़ें",
+                addExpenseDescription: "इस फॉर्म का उपयोग ठेकेदार भुगतान और अन्य निर्माण खर्च दर्ज करने के लिए करें।",
+                labelDate: "तारीख",
+                labelCategory: "श्रेणी",
+                labelAmount: "राशि",
+                labelPaymentMode: "भुगतान का तरीका",
+                labelDescription: "विवरण",
+                labelPaidTo: "किसे भुगतान",
+                labelScreenshot: "बिल / स्क्रीनशॉट",
+                saveExpense: "खर्च सेव करें",
+                clearForm: "फॉर्म साफ करें",
+                historyTitle: "खर्च हिस्ट्री",
+                historyDescription: "सहेजे गए सभी भुगतान और खरीद यहां नवीनतम क्रम में दिखेंगे।",
+                settingsBudgetTitle: "कुल बजट सेट करें",
+                settingsBudgetLabel: "बजट राशि",
+                saveBudget: "बजट सेव करें",
+                settingsContractorTitle: "ठेकेदार जोड़ें",
+                contractorFieldName: "नाम",
+                contractorFieldPhone: "फोन",
+                contractorFieldWorkType: "काम का प्रकार",
+                contractorFieldAgreedAmount: "तय राशि",
+                saveContractor: "ठेकेदार सेव करें",
+                settingsNote: "इस पेज से कुल बजट और ठेकेदार सूची को प्रबंधित करें।",
+                categoryMaterial: "सामग्री",
+                categoryContractor: "ठेकेदार",
+                categoryEquipment: "उपकरण",
+                categoryMiscellaneous: "विविध",
+                paymentUpi: "यूपीआई",
+                paymentCash: "नकद",
+                paymentBankTransfer: "बैंक ट्रांसफर",
+                paymentCheque: "चेक",
+                expenseDescriptionPlaceholder: "उदाहरण: सीमेंट बैग, शटरिंग मजदूरी, प्लंबिंग एडवांस",
+                paidToPlaceholder: "विक्रेता या ठेकेदार का नाम दर्ज करें",
+                contractorWorkTypePlaceholder: "सिविल, प्लंबिंग, इलेक्ट्रिकल...",
+                tableDate: "तारीख",
+                tableDescription: "विवरण",
+                tableAmount: "राशि",
+                tableMode: "तरीका",
+                tableProof: "प्रूफ",
+                tableCategory: "श्रेणी",
+                tablePaidTo: "किसे भुगतान",
+                noContractorsFound: "कोई ठेकेदार नहीं मिला",
+                noContractorsAddedYet: "अभी तक कोई ठेकेदार नहीं जोड़ा गया है।",
+                selectContractorFirst: "पहले एक ठेकेदार चुनें।",
+                noPaymentsRecorded: "इस ठेकेदार के लिए अभी तक कोई भुगतान दर्ज नहीं है।",
+                viewProof: "प्रूफ देखें",
+                noExpensesRecorded: "अभी तक कोई खर्च दर्ज नहीं है।",
+                paidToPrefix: "किसे भुगतान",
+                modePrefix: "तरीका",
+                openBill: "बिल / स्क्रीनशॉट खोलें",
+                ownerPasswordFirst: "पहले मालिक का पासवर्ड दर्ज करें।",
+                checkingPassword: "पासवर्ड जांचा जा रहा है...",
+                ownerUnlocked: "मालिक डैशबोर्ड सफलतापूर्वक खुल गया।",
+                ownerSessionClosed: "मालिक सत्र बंद कर दिया गया।",
+                expenseSaved: "खर्च सफलतापूर्वक सेव हो गया।",
+                budgetUpdated: "बजट सफलतापूर्वक अपडेट हो गया।",
+                contractorSaved: "ठेकेदार सफलतापूर्वक सेव हो गया।",
+                fileReadError: "चुनी गई फाइल पढ़ी नहीं जा सकी।"
+            }
+        };
+
         const state = {
             ownerSecret: "",
-            contractors: []
+            contractors: [],
+            contractorPayments: [],
+            contractorTotal: 0,
+            summary: {
+                totalBudget: 0,
+                total: 0,
+                Contractor: 0,
+                Material: 0
+            },
+            recentExpenses: [],
+            historyExpenses: [],
+            currentLang: "en",
+            route: "home",
+            ownerLoginMessage: null
         };
 
         const currency = new Intl.NumberFormat("en-IN", {
@@ -669,6 +930,10 @@
 
         function byId(id) {
             return document.getElementById(id);
+        }
+
+        function t(key) {
+            return TRANSLATIONS[state.currentLang][key] || TRANSLATIONS.en[key] || key;
         }
 
         function formatMoney(value) {
@@ -696,7 +961,7 @@
 
         function ensureApiConfigured() {
             if (!CONFIG.API_URL) {
-                throw new Error("API_URL is not configured yet. Replace https://script.google.com/macros/s/AKfycbzxyl6V3Lz2rgqEdt68yBBc2bDaT2B2EzOxrUQ08rFB5UbV15G8pgpSxCZWK2EU_IGp/exec in index.html with the deployed Apps Script /exec URL.");
+                throw new Error("API_URL is not configured.");
             }
         }
 
@@ -748,30 +1013,191 @@
             return parseApiResponse(response);
         }
 
-        function openContractorView() {
-            hideSections();
-            byId("contractorView").classList.remove("hidden");
-            loadContractors();
+        function getRoute() {
+            const params = new URLSearchParams(window.location.search);
+            const view = params.get("view");
+            return view === "contractor" || view === "owner" ? view : "home";
         }
 
-        function openOwnerLogin() {
-            hideSections();
-            byId("ownerLoginView").classList.remove("hidden");
-            byId("ownerPassword").focus();
+        function getDefaultLanguage(route) {
+            return route === "contractor" ? "hi" : "en";
         }
 
-        function hideSections() {
+        function updatePageTitle() {
+            const titles = {
+                home: {
+                    en: "House Construction Tracker",
+                    hi: "घर निर्माण ट्रैकर"
+                },
+                contractor: {
+                    en: "Contractor View | House Construction Tracker",
+                    hi: "ठेकेदार दृश्य | घर निर्माण ट्रैकर"
+                },
+                owner: {
+                    en: "Owner Dashboard | House Construction Tracker",
+                    hi: "मालिक डैशबोर्ड | घर निर्माण ट्रैकर"
+                }
+            };
+
+            document.title = titles[state.route][state.currentLang];
+            document.documentElement.lang = state.currentLang === "hi" ? "hi" : "en";
+        }
+
+        function updateLanguageToggle() {
+            byId("languageToggle").textContent = state.currentLang === "en" ? "हिंदी" : "English";
+        }
+
+        function updateStaticTranslations() {
+            document.querySelectorAll("[data-i18n]").forEach((element) => {
+                element.textContent = t(element.dataset.i18n);
+            });
+
+            document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+                element.placeholder = t(element.dataset.i18nPlaceholder);
+            });
+
+            updateLanguageToggle();
+            updatePageTitle();
+        }
+
+        function setOwnerLoginMessage(value, raw) {
+            state.ownerLoginMessage = value ? { value, raw: !!raw } : null;
+            renderOwnerLoginMessage();
+        }
+
+        function renderOwnerLoginMessage() {
+            byId("ownerLoginMessage").textContent = state.ownerLoginMessage
+                ? state.ownerLoginMessage.raw
+                    ? state.ownerLoginMessage.value
+                    : t(state.ownerLoginMessage.value)
+                : "";
+        }
+
+        function renderContractorSelects() {
+            const select = byId("contractorSelect");
+            const selectedValue = select.value;
+            const contractorOptions = state.contractors
+                .map((contractor) => `<option value="${escapeHtml(contractor.Name)}">${escapeHtml(contractor.Name)}</option>`)
+                .join("");
+
+            select.innerHTML = contractorOptions || `<option value="">${escapeHtml(t("noContractorsFound"))}</option>`;
+
+            if (selectedValue && state.contractors.some((contractor) => contractor.Name === selectedValue)) {
+                select.value = selectedValue;
+            }
+
+            renderPaidToInput();
+        }
+
+        function renderPaidToInput() {
+            const category = byId("expenseCategory").value;
+            const container = byId("paidToContainer");
+            const existingField = byId("expensePaidTo");
+            const existingValue = existingField ? existingField.value : "";
+
+            if (category === "Contractor" && state.contractors.length > 0) {
+                container.innerHTML = `
+                    <select id="expensePaidTo" required>
+                        ${state.contractors.map((contractor) => `<option value="${escapeHtml(contractor.Name)}">${escapeHtml(contractor.Name)}</option>`).join("")}
+                    </select>
+                `;
+
+                if (existingValue) {
+                    byId("expensePaidTo").value = existingValue;
+                }
+                return;
+            }
+
+            container.innerHTML = `<input id="expensePaidTo" type="text" placeholder="${escapeHtml(t("paidToPlaceholder"))}" required />`;
+            byId("expensePaidTo").value = existingValue;
+        }
+
+        function renderContractorPayments() {
+            byId("contractorTotalPaid").textContent = formatMoney(state.contractorTotal || 0);
+
+            byId("contractorPaymentsBody").innerHTML = state.contractorPayments.length
+                ? state.contractorPayments.map((payment) => `
+                    <tr>
+                        <td>${escapeHtml(payment.Date)}</td>
+                        <td>${escapeHtml(payment.Description)}</td>
+                        <td>${formatMoney(payment.Amount)}</td>
+                        <td>${escapeHtml(payment.PaymentMode)}</td>
+                        <td>${payment.ScreenshotUrl ? `<a href="${payment.ScreenshotUrl}" target="_blank" rel="noreferrer">${escapeHtml(t("viewProof"))}</a>` : "-"}</td>
+                    </tr>
+                `).join("")
+                : `<tr><td colspan="5" class="muted">${escapeHtml(t("noPaymentsRecorded"))}</td></tr>`;
+        }
+
+        function renderDashboard() {
+            byId("budgetValue").textContent = formatMoney(state.summary.totalBudget || 0);
+            byId("spentValue").textContent = formatMoney(state.summary.total || 0);
+            byId("contractorSpentValue").textContent = formatMoney(state.summary.Contractor || 0);
+            byId("materialSpentValue").textContent = formatMoney(state.summary.Material || 0);
+            byId("totalBudgetInput").value = Number(state.summary.totalBudget || 0);
+
+            byId("recentExpensesBody").innerHTML = state.recentExpenses.length
+                ? state.recentExpenses.map((expense) => `
+                    <tr>
+                        <td>${escapeHtml(expense.Date)}</td>
+                        <td>${escapeHtml(expense.Category)}</td>
+                        <td>${escapeHtml(expense.Description)}</td>
+                        <td>${escapeHtml(expense.PaidTo)}</td>
+                        <td>${formatMoney(expense.Amount)}</td>
+                    </tr>
+                `).join("")
+                : `<tr><td colspan="5" class="muted">${escapeHtml(t("noExpensesRecorded"))}</td></tr>`;
+        }
+
+        function renderHistory() {
+            byId("historyList").innerHTML = state.historyExpenses.length
+                ? state.historyExpenses.map((expense) => `
+                    <article class="history-item">
+                        <strong>${escapeHtml(expense.Date)} · ${escapeHtml(expense.Category)} · ${formatMoney(expense.Amount)}</strong>
+                        <div>${escapeHtml(expense.Description)}</div>
+                        <div class="muted" style="margin-top: 8px;">${escapeHtml(t("paidToPrefix"))}: ${escapeHtml(expense.PaidTo)} · ${escapeHtml(t("modePrefix"))}: ${escapeHtml(expense.PaymentMode)}</div>
+                        ${expense.ScreenshotUrl ? `<div style="margin-top: 10px;"><a href="${expense.ScreenshotUrl}" target="_blank" rel="noreferrer">${escapeHtml(t("openBill"))}</a></div>` : ""}
+                    </article>
+                `).join("")
+                : `<div class="history-item muted">${escapeHtml(t("noExpensesRecorded"))}</div>`;
+        }
+
+        function updateLanguage() {
+            updateStaticTranslations();
+            renderOwnerLoginMessage();
+            renderContractorSelects();
+            renderContractorPayments();
+            renderDashboard();
+            renderHistory();
+        }
+
+        function toggleLanguage() {
+            state.currentLang = state.currentLang === "en" ? "hi" : "en";
+            updateLanguage();
+        }
+
+        function renderRoute() {
+            state.route = getRoute();
+
+            byId("homeView").classList.toggle("hidden", state.route !== "home");
+            byId("contractorView").classList.toggle("hidden", state.route !== "contractor");
+            byId("ownerLoginView").classList.toggle("hidden", state.route !== "owner" || !!state.ownerSecret);
+            byId("ownerSection").classList.toggle("hidden", state.route !== "owner" || !state.ownerSecret);
+
             hideBanner();
-            byId("contractorView").classList.add("hidden");
-            byId("ownerLoginView").classList.add("hidden");
-            byId("ownerSection").classList.add("hidden");
+            updateLanguage();
+            window.scrollTo({ top: 0, behavior: "auto" });
+        }
+
+        function clearExpenseForm() {
+            byId("expenseForm").reset();
+            setToday();
+            renderPaidToInput();
         }
 
         function logoutOwner() {
             state.ownerSecret = "";
-            byId("ownerPassword").value = "";
-            hideSections();
-            showBanner("Owner session closed.", "info");
+            setOwnerLoginMessage("ownerSessionClosed");
+            renderRoute();
         }
 
         function switchTab(tabName) {
@@ -783,41 +1209,15 @@
             });
         }
 
-        function renderContractorSelects() {
-            const contractorOptions = state.contractors
-                .map((contractor) => `<option value="${escapeHtml(contractor.Name)}">${escapeHtml(contractor.Name)}</option>`)
-                .join("");
-
-            byId("contractorSelect").innerHTML = contractorOptions || '<option value="">No contractors found</option>';
-
-            renderPaidToInput();
-        }
-
-        function renderPaidToInput() {
-            const category = byId("expenseCategory").value;
-
-            if (category === "Contractor" && state.contractors.length > 0) {
-                byId("paidToContainer").innerHTML = `
-                    <select id="expensePaidTo" required>
-                        ${state.contractors.map((contractor) => `<option value="${escapeHtml(contractor.Name)}">${escapeHtml(contractor.Name)}</option>`).join("")}
-                    </select>
-                `;
-                return;
-            }
-
-            byId("paidToContainer").innerHTML = '<input id="expensePaidTo" type="text" placeholder="Enter vendor or contractor name" required />';
-        }
-
         async function loadContractors() {
             try {
                 const data = await apiGet("getContractors", { secret: CONFIG.PUBLIC_TOKEN });
                 state.contractors = Array.isArray(data.contractors) ? data.contractors : [];
                 renderContractorSelects();
+                renderContractorPayments();
 
                 if (!state.contractors.length) {
-                    showBanner("No contractors have been added yet.", "info");
-                } else {
-                    hideBanner();
+                    showBanner(t("noContractorsAddedYet"), "info");
                 }
             } catch (error) {
                 showBanner(error.message, "error");
@@ -828,27 +1228,15 @@
             const contractorName = byId("contractorSelect").value;
 
             if (!contractorName) {
-                showBanner("Select a contractor first.", "info");
+                showBanner(t("selectContractorFirst"), "info");
                 return;
             }
 
             try {
                 const data = await apiGet("getContractorPayments", { contractorName });
-                const payments = Array.isArray(data.payments) ? data.payments : [];
-
-                byId("contractorTotalPaid").textContent = formatMoney(data.total || 0);
-                byId("contractorPaymentsBody").innerHTML = payments.length
-                    ? payments.map((payment) => `
-                        <tr>
-                            <td>${escapeHtml(payment.Date)}</td>
-                            <td>${escapeHtml(payment.Description)}</td>
-                            <td>${formatMoney(payment.Amount)}</td>
-                            <td>${escapeHtml(payment.PaymentMode)}</td>
-                            <td>${payment.ScreenshotUrl ? `<a href="${payment.ScreenshotUrl}" target="_blank" rel="noreferrer">View Proof</a>` : "-"}</td>
-                        </tr>
-                    `).join("")
-                    : '<tr><td colspan="5" class="muted">No payments recorded yet for this contractor.</td></tr>';
-
+                state.contractorPayments = Array.isArray(data.payments) ? data.payments : [];
+                state.contractorTotal = data.total || 0;
+                renderContractorPayments();
                 hideBanner();
             } catch (error) {
                 showBanner(error.message, "error");
@@ -859,23 +1247,22 @@
             const password = byId("ownerPassword").value.trim();
 
             if (!password) {
-                byId("ownerLoginMessage").textContent = "Enter the owner password first.";
+                setOwnerLoginMessage("ownerPasswordFirst");
                 return;
             }
 
-            byId("ownerLoginMessage").textContent = "Checking password...";
+            setOwnerLoginMessage("checkingPassword");
 
             try {
                 await apiGet("getSummary", { secret: password });
                 state.ownerSecret = password;
-                byId("ownerLoginMessage").textContent = "";
-                hideSections();
-                byId("ownerSection").classList.remove("hidden");
+                setOwnerLoginMessage(null);
+                renderRoute();
                 switchTab("dashboard");
                 await refreshOwnerData();
-                showBanner("Owner dashboard unlocked successfully.", "success");
+                showBanner(t("ownerUnlocked"), "success");
             } catch (error) {
-                byId("ownerLoginMessage").textContent = error.message;
+                setOwnerLoginMessage(error.message, true);
             }
         }
 
@@ -893,40 +1280,20 @@
             const data = await apiGet("getSummary", { secret: state.ownerSecret });
             const summary = data.summary || {};
 
-            byId("budgetValue").textContent = formatMoney(data.totalBudget || 0);
-            byId("spentValue").textContent = formatMoney(summary.total || 0);
-            byId("contractorSpentValue").textContent = formatMoney(summary.Contractor || 0);
-            byId("materialSpentValue").textContent = formatMoney(summary.Material || 0);
-            byId("totalBudgetInput").value = Number(data.totalBudget || 0);
-
-            const recentExpenses = Array.isArray(data.recentExpenses) ? data.recentExpenses : [];
-            byId("recentExpensesBody").innerHTML = recentExpenses.length
-                ? recentExpenses.map((expense) => `
-                    <tr>
-                        <td>${escapeHtml(expense.Date)}</td>
-                        <td>${escapeHtml(expense.Category)}</td>
-                        <td>${escapeHtml(expense.Description)}</td>
-                        <td>${escapeHtml(expense.PaidTo)}</td>
-                        <td>${formatMoney(expense.Amount)}</td>
-                    </tr>
-                `).join("")
-                : '<tr><td colspan="5" class="muted">No expenses recorded yet.</td></tr>';
+            state.summary = {
+                totalBudget: data.totalBudget || 0,
+                total: summary.total || 0,
+                Contractor: summary.Contractor || 0,
+                Material: summary.Material || 0
+            };
+            state.recentExpenses = Array.isArray(data.recentExpenses) ? data.recentExpenses : [];
+            renderDashboard();
         }
 
         async function loadHistory() {
             const data = await apiGet("getExpenses", { secret: state.ownerSecret });
-            const expenses = Array.isArray(data.expenses) ? data.expenses : [];
-
-            byId("historyList").innerHTML = expenses.length
-                ? expenses.map((expense) => `
-                    <article class="history-item">
-                        <strong>${escapeHtml(expense.Date)} · ${escapeHtml(expense.Category)} · ${formatMoney(expense.Amount)}</strong>
-                        <div>${escapeHtml(expense.Description)}</div>
-                        <div class="muted" style="margin-top: 8px;">Paid To: ${escapeHtml(expense.PaidTo)} · Mode: ${escapeHtml(expense.PaymentMode)}</div>
-                        ${expense.ScreenshotUrl ? `<div style="margin-top: 10px;"><a href="${expense.ScreenshotUrl}" target="_blank" rel="noreferrer">Open Bill / Screenshot</a></div>` : ""}
-                    </article>
-                `).join("")
-                : '<div class="history-item muted">No expenses recorded yet.</div>';
+            state.historyExpenses = Array.isArray(data.expenses) ? data.expenses : [];
+            renderHistory();
         }
 
         async function saveExpense(event) {
@@ -934,7 +1301,7 @@
 
             const saveButton = byId("saveExpenseBtn");
             saveButton.disabled = true;
-            saveButton.textContent = "Saving...";
+            saveButton.textContent = state.currentLang === "en" ? "Saving..." : "सेव हो रहा है...";
 
             try {
                 let screenshotUrl = "";
@@ -962,17 +1329,15 @@
                     screenshotUrl
                 });
 
-                byId("expenseForm").reset();
-                setToday();
-                renderPaidToInput();
+                clearExpenseForm();
                 await refreshOwnerData();
                 switchTab("dashboard");
-                showBanner("Expense saved successfully.", "success");
+                showBanner(t("expenseSaved"), "success");
             } catch (error) {
                 showBanner(error.message, "error");
             } finally {
                 saveButton.disabled = false;
-                saveButton.textContent = "Save Expense";
+                saveButton.textContent = t("saveExpense");
             }
         }
 
@@ -986,7 +1351,7 @@
                 });
 
                 await loadDashboard();
-                showBanner("Budget updated successfully.", "success");
+                showBanner(t("budgetUpdated"), "success");
             } catch (error) {
                 showBanner(error.message, "error");
             }
@@ -1006,7 +1371,7 @@
 
                 byId("contractorForm").reset();
                 await loadOwnerContractors();
-                showBanner("Contractor saved successfully.", "success");
+                showBanner(t("contractorSaved"), "success");
             } catch (error) {
                 showBanner(error.message, "error");
             }
@@ -1016,7 +1381,7 @@
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = () => resolve(reader.result);
-                reader.onerror = () => reject(new Error("Could not read the selected file."));
+                reader.onerror = () => reject(new Error(t("fileReadError")));
                 reader.readAsDataURL(file);
             });
         }
@@ -1034,11 +1399,24 @@
                 .replaceAll("'", "&#39;");
         }
 
-        byId("expenseForm").addEventListener("submit", saveExpense);
-        byId("budgetForm").addEventListener("submit", saveBudget);
-        byId("contractorForm").addEventListener("submit", saveContractor);
-        setToday();
-        renderPaidToInput();
+        function initializePage() {
+            state.route = getRoute();
+            state.currentLang = getDefaultLanguage(state.route);
+
+            byId("expenseForm").addEventListener("submit", saveExpense);
+            byId("budgetForm").addEventListener("submit", saveBudget);
+            byId("contractorForm").addEventListener("submit", saveContractor);
+
+            setToday();
+            renderPaidToInput();
+            renderRoute();
+
+            if (state.route === "contractor") {
+                loadContractors();
+            }
+        }
+
+        initializePage();
     </script>
 </body>
 </html>
