@@ -40,7 +40,7 @@
         }
 
         .container {
-            width: min(1120px, calc(100% - 32px));
+            width: min(1240px, calc(100% - 32px));
             margin: 0 auto;
             padding: 26px 0 64px;
         }
@@ -212,8 +212,13 @@
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         }
 
+        .dashboard-kpi-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
         .stats-card {
             padding: 22px;
+            min-width: 0;
         }
 
         .stats-card .label {
@@ -223,9 +228,12 @@
 
         .stats-card .value {
             margin-top: 10px;
-            font-size: clamp(28px, 5vw, 40px);
+            font-size: clamp(26px, 3.1vw, 40px);
             font-weight: 700;
-            line-height: 1;
+            line-height: 1.05;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .stats-card.accent {
@@ -276,7 +284,8 @@
 
         .btn:hover,
         .tab-btn:hover,
-        .secondary-btn:hover {
+        .secondary-btn:hover,
+        .danger-btn:hover {
             transform: translateY(-1px);
         }
 
@@ -290,6 +299,27 @@
             background: #f3faf8;
             color: var(--accent-dark);
             border: 1px solid var(--border);
+        }
+
+        .danger-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 18px;
+            border-radius: 14px;
+            border: 1px solid #efc2bc;
+            background: #fff5f3;
+            color: var(--danger);
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .danger-btn:disabled {
+            cursor: wait;
+            opacity: 0.72;
+            transform: none;
         }
 
         .tab-btn {
@@ -408,6 +438,25 @@
             font-size: 16px;
         }
 
+        .history-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .history-actions a {
+            display: inline-flex;
+            align-items: center;
+            font-weight: 700;
+        }
+
+        @media (max-width: 1080px) {
+            .dashboard-kpi-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
         .muted {
             color: var(--muted);
         }
@@ -445,6 +494,10 @@
 
             .owner-nav {
                 width: 100%;
+            }
+
+            .dashboard-kpi-grid {
+                grid-template-columns: 1fr;
             }
 
             .tab-btn {
@@ -577,7 +630,7 @@
                 </div>
 
                 <section id="dashboardTab" class="panel tab-panel active">
-                    <div class="grid kpi-grid">
+                    <div class="grid kpi-grid dashboard-kpi-grid">
                         <div class="stats-card accent">
                             <div class="label" data-i18n="totalBudget">Total Budget</div>
                             <div class="value" id="budgetValue">₹0</div>
@@ -862,6 +915,11 @@
                 noPaymentsRecorded: "No payments recorded yet for this contractor.",
                 viewProof: "View Proof",
                 noExpensesRecorded: "No expenses recorded yet.",
+                deleteExpenseAction: "Delete Expense",
+                deleteExpenseConfirm: "Delete this expense permanently?",
+                deleteExpenseSuccess: "Expense deleted successfully.",
+                deletingExpense: "Deleting...",
+                deleteExpenseUnavailable: "This expense cannot be deleted right now.",
                 paidToPrefix: "Paid To",
                 paidByPrefix: "Paid By",
                 typePrefix: "Type",
@@ -973,6 +1031,11 @@
                 noPaymentsRecorded: "इस ठेकेदार के लिए अभी तक कोई भुगतान दर्ज नहीं है।",
                 viewProof: "प्रूफ देखें",
                 noExpensesRecorded: "अभी तक कोई खर्च दर्ज नहीं है।",
+                deleteExpenseAction: "खर्च हटाएं",
+                deleteExpenseConfirm: "क्या आप इस खर्च को हमेशा के लिए हटाना चाहते हैं?",
+                deleteExpenseSuccess: "खर्च सफलतापूर्वक हट गया।",
+                deletingExpense: "हटाया जा रहा है...",
+                deleteExpenseUnavailable: "यह खर्च अभी हटाया नहीं जा सकता।",
                 paidToPrefix: "किसे भुगतान",
                 paidByPrefix: "किसने भुगतान किया",
                 typePrefix: "प्रकार",
@@ -1013,7 +1076,8 @@
             currentLang: "en",
             route: "home",
             ownerLoginMessage: null,
-            contractorsLoading: false
+            contractorsLoading: false,
+            deletingExpenseId: ""
         };
 
         const currency = new Intl.NumberFormat("en-IN", {
@@ -1351,7 +1415,10 @@
                             ${escapeHtml(t("typePrefix"))}: ${escapeHtml(getEntryKindLabel(expense.EntryKind))}${expense.AdvanceParty ? ` · ${escapeHtml(t("advancePartyPrefix"))}: ${escapeHtml(expense.AdvanceParty)}` : ""} ·
                             ${escapeHtml(t("modePrefix"))}: ${escapeHtml(expense.PaymentMode)}
                         </div>
-                        ${expense.ScreenshotUrl ? `<div style="margin-top: 10px;"><a href="${expense.ScreenshotUrl}" target="_blank" rel="noreferrer">${escapeHtml(t("openBill"))}</a></div>` : ""}
+                        <div class="history-actions">
+                            ${expense.ScreenshotUrl ? `<a href="${expense.ScreenshotUrl}" target="_blank" rel="noreferrer">${escapeHtml(t("openBill"))}</a>` : ""}
+                            ${expense.ID ? `<button class="danger-btn" type="button" onclick="deleteExpense('${escapeHtml(expense.ID)}')" ${state.deletingExpenseId === expense.ID ? "disabled" : ""}>${escapeHtml(state.deletingExpenseId === expense.ID ? t("deletingExpense") : t("deleteExpenseAction"))}</button>` : ""}
+                        </div>
                     </article>
                 `).join("")
                 : `<div class="history-item muted">${escapeHtml(t("noExpensesRecorded"))}</div>`;
@@ -1554,6 +1621,35 @@
             } finally {
                 saveButton.disabled = false;
                 saveButton.textContent = t("saveExpense");
+            }
+        }
+
+        async function deleteExpense(expenseId) {
+            if (!expenseId) {
+                showBanner(t("deleteExpenseUnavailable"), "error");
+                return;
+            }
+
+            if (!window.confirm(t("deleteExpenseConfirm"))) {
+                return;
+            }
+
+            state.deletingExpenseId = expenseId;
+            renderHistory();
+
+            try {
+                await apiPost("deleteExpense", {
+                    secret: state.ownerSecret,
+                    expenseId
+                });
+
+                await Promise.all([loadDashboard(), loadHistory()]);
+                showBanner(t("deleteExpenseSuccess"), "success");
+            } catch (error) {
+                showBanner(error.message, "error");
+            } finally {
+                state.deletingExpenseId = "";
+                renderHistory();
             }
         }
 

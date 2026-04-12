@@ -42,6 +42,8 @@ function handleRequest_(payload) {
         return jsonResponse_(getExpenses_(payload));
       case 'addExpense':
         return jsonResponse_(addExpense_(payload));
+      case 'deleteExpense':
+        return jsonResponse_(deleteExpense_(payload));
       case 'updateBudget':
         return jsonResponse_(updateBudget_(payload));
       case 'addContractor':
@@ -230,6 +232,41 @@ function addExpense_(payload) {
     entryKind,
     advanceParty
   ]);
+
+  return { success: true };
+}
+
+function deleteExpense_(payload) {
+  requireOwner_(payload.secret);
+
+  const expenseId = String(payload.expenseId || '').trim();
+
+  if (!expenseId) {
+    throw new Error('expenseId is required.');
+  }
+
+  const sheet = getSpreadsheet_().getSheetByName(SHEET_NAMES.EXPENSES);
+  const lastRow = sheet.getLastRow();
+
+  if (lastRow <= 1) {
+    throw new Error('Expense not found.');
+  }
+
+  const idValues = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  let rowToDelete = -1;
+
+  for (let index = 0; index < idValues.length; index += 1) {
+    if (String(idValues[index][0] || '').trim() === expenseId) {
+      rowToDelete = index + 2;
+      break;
+    }
+  }
+
+  if (rowToDelete === -1) {
+    throw new Error('Expense not found.');
+  }
+
+  sheet.deleteRow(rowToDelete);
 
   return { success: true };
 }
