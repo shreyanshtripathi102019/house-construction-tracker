@@ -42,6 +42,8 @@ function handleRequest_(payload) {
         return jsonResponse_(getExpenses_(payload));
       case 'addExpense':
         return jsonResponse_(addExpense_(payload));
+      case 'updateExpense':
+        return jsonResponse_(updateExpense_(payload));
       case 'deleteExpense':
         return jsonResponse_(deleteExpense_(payload));
       case 'updateBudget':
@@ -236,6 +238,63 @@ function addExpense_(payload) {
   return { success: true };
 }
 
+function updateExpense_(payload) {
+  requireOwner_(payload.secret);
+
+  const expenseId = String(payload.expenseId || '').trim();
+  const date = String(payload.date || '').trim();
+  const category = String(payload.category || '').trim();
+  const description = String(payload.description || '').trim();
+  const amount = toNumber_(payload.amount);
+  const paymentMode = String(payload.paymentMode || '').trim();
+  const paidToValue = String(payload.paidTo || '').trim();
+  const screenshotUrl = String(payload.screenshotUrl || '').trim();
+  const paidBy = String(payload.paidBy || '').trim();
+  const entryKind = String(payload.entryKind || ENTRY_KINDS.DIRECT_EXPENSE).trim();
+  const advanceParty = String(payload.advanceParty || '').trim();
+  const paidTo = entryKind === ENTRY_KINDS.ADVANCE_GIVEN && advanceParty
+    ? advanceParty
+    : paidToValue;
+  const sheet = getSpreadsheet_().getSheetByName(SHEET_NAMES.EXPENSES);
+  const rowToUpdate = findExpenseRowById_(sheet, expenseId);
+
+  if (!expenseId) {
+    throw new Error('expenseId is required.');
+  }
+
+  if (!date || !category || !description || !amount || !paymentMode || !paidTo || !paidBy) {
+    throw new Error('date, category, description, amount, paymentMode, paidTo, and paidBy are required.');
+  }
+
+  if (Object.keys(ENTRY_KINDS).map(function(key) { return ENTRY_KINDS[key]; }).indexOf(entryKind) === -1) {
+    throw new Error('Invalid entry type.');
+  }
+
+  if (rowToUpdate === -1) {
+    throw new Error('Expense not found.');
+  }
+
+  const existingRow = sheet.getRange(rowToUpdate, 1, 1, 12).getValues()[0];
+  const createdAt = existingRow[8] || new Date().toISOString();
+
+  sheet.getRange(rowToUpdate, 1, 1, 12).setValues([[
+    expenseId,
+    date,
+    category,
+    description,
+    amount,
+    paymentMode,
+    paidTo,
+    screenshotUrl,
+    createdAt,
+    paidBy,
+    entryKind,
+    advanceParty
+  ]]);
+
+  return { success: true };
+}
+
 function deleteExpense_(payload) {
   requireOwner_(payload.secret);
 
@@ -246,21 +305,7 @@ function deleteExpense_(payload) {
   }
 
   const sheet = getSpreadsheet_().getSheetByName(SHEET_NAMES.EXPENSES);
-  const lastRow = sheet.getLastRow();
-
-  if (lastRow <= 1) {
-    throw new Error('Expense not found.');
-  }
-
-  const idValues = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
-  let rowToDelete = -1;
-
-  for (let index = 0; index < idValues.length; index += 1) {
-    if (String(idValues[index][0] || '').trim() === expenseId) {
-      rowToDelete = index + 2;
-      break;
-    }
-  }
+  const rowToDelete = findExpenseRowById_(sheet, expenseId);
 
   if (rowToDelete === -1) {
     throw new Error('Expense not found.');
@@ -269,6 +314,24 @@ function deleteExpense_(payload) {
   sheet.deleteRow(rowToDelete);
 
   return { success: true };
+}
+
+function findExpenseRowById_(sheet, expenseId) {
+  const lastRow = sheet.getLastRow();
+
+  if (lastRow <= 1) {
+    return -1;
+  }
+
+  const idValues = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+
+  for (let index = 0; index < idValues.length; index += 1) {
+    if (String(idValues[index][0] || '').trim() === expenseId) {
+      return index + 2;
+    }
+  }
+
+  return -1;
 }
 
 function updateBudget_(payload) {

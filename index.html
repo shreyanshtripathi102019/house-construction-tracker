@@ -322,6 +322,12 @@
             transform: none;
         }
 
+        .action-btn {
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+        }
+
         .tab-btn {
             padding: 12px 18px;
             background: #f3faf8;
@@ -449,6 +455,12 @@
             display: inline-flex;
             align-items: center;
             font-weight: 700;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
         @media (max-width: 1080px) {
@@ -666,6 +678,7 @@
                                         <th data-i18n="tableDescription">Description</th>
                                         <th data-i18n="tablePaidTo">Paid To</th>
                                         <th data-i18n="tableAmount">Amount</th>
+                                        <th data-i18n="tableActions">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="recentExpensesBody"></tbody>
@@ -677,8 +690,8 @@
                 <section id="addExpenseTab" class="panel tab-panel">
                     <div class="panel-title-row">
                         <div>
-                            <h3 data-i18n="addExpenseTitle">Add Expense</h3>
-                            <p class="panel-copy" data-i18n="addExpenseDescription">
+                            <h3 id="expenseFormTitle" data-i18n="addExpenseTitle">Add Expense</h3>
+                            <p id="expenseFormDescription" class="panel-copy" data-i18n="addExpenseDescription">
                                 Use this form for contractor payments and other construction expenses.
                             </p>
                         </div>
@@ -751,9 +764,11 @@
                         </div>
 
                         <p id="expenseFlowHint" class="footer-note"></p>
+                        <p id="editingExpenseNote" class="footer-note hidden"></p>
 
                         <div class="inline-actions">
                             <button id="saveExpenseBtn" class="btn" type="submit" data-i18n="saveExpense">Save Expense</button>
+                            <button id="cancelEditBtn" class="secondary-btn hidden" type="button" onclick="clearExpenseForm()" data-i18n="cancelEdit">Cancel Edit</button>
                             <button class="secondary-btn" type="button" onclick="clearExpenseForm()" data-i18n="clearForm">Clear Form</button>
                         </div>
                     </form>
@@ -909,12 +924,22 @@
                 tableProof: "Proof",
                 tableCategory: "Category",
                 tablePaidTo: "Paid To",
+                tableActions: "Actions",
                 noContractorsFound: "No contractors found",
                 noContractorsAddedYet: "No contractors have been added yet.",
                 selectContractorFirst: "Select a contractor first.",
                 noPaymentsRecorded: "No payments recorded yet for this contractor.",
                 viewProof: "View Proof",
                 noExpensesRecorded: "No expenses recorded yet.",
+                editExpenseAction: "Edit",
+                editExpenseTitle: "Edit Expense",
+                editExpenseDescription: "Update the expense details and save the changes.",
+                editExpenseLoaded: "Expense loaded for editing.",
+                editExpenseUnavailable: "This expense cannot be edited right now.",
+                updateExpense: "Update Expense",
+                updateExpenseSuccess: "Expense updated successfully.",
+                updatingExpense: "Updating...",
+                cancelEdit: "Cancel Edit",
                 deleteExpenseAction: "Delete Expense",
                 deleteExpenseConfirm: "Delete this expense permanently?",
                 deleteExpenseSuccess: "Expense deleted successfully.",
@@ -1025,12 +1050,22 @@
                 tableProof: "प्रूफ",
                 tableCategory: "श्रेणी",
                 tablePaidTo: "किसे भुगतान",
+                tableActions: "एक्शन",
                 noContractorsFound: "कोई ठेकेदार नहीं मिला",
                 noContractorsAddedYet: "अभी तक कोई ठेकेदार नहीं जोड़ा गया है।",
                 selectContractorFirst: "पहले एक ठेकेदार चुनें।",
                 noPaymentsRecorded: "इस ठेकेदार के लिए अभी तक कोई भुगतान दर्ज नहीं है।",
                 viewProof: "प्रूफ देखें",
                 noExpensesRecorded: "अभी तक कोई खर्च दर्ज नहीं है।",
+                editExpenseAction: "एडिट करें",
+                editExpenseTitle: "खर्च एडिट करें",
+                editExpenseDescription: "खर्च की जानकारी बदलें और बदलाव सेव करें।",
+                editExpenseLoaded: "खर्च एडिट करने के लिए लोड हो गया।",
+                editExpenseUnavailable: "यह खर्च अभी एडिट नहीं किया जा सकता।",
+                updateExpense: "खर्च अपडेट करें",
+                updateExpenseSuccess: "खर्च सफलतापूर्वक अपडेट हो गया।",
+                updatingExpense: "अपडेट हो रहा है...",
+                cancelEdit: "एडिट रद्द करें",
                 deleteExpenseAction: "खर्च हटाएं",
                 deleteExpenseConfirm: "क्या आप इस खर्च को हमेशा के लिए हटाना चाहते हैं?",
                 deleteExpenseSuccess: "खर्च सफलतापूर्वक हट गया।",
@@ -1077,7 +1112,9 @@
             route: "home",
             ownerLoginMessage: null,
             contractorsLoading: false,
-            deletingExpenseId: ""
+            deletingExpenseId: "",
+            editingExpenseId: "",
+            editingExpenseScreenshotUrl: ""
         };
 
         const currency = new Intl.NumberFormat("en-IN", {
@@ -1379,6 +1416,19 @@
                 : `<tr><td colspan="5" class="muted">${escapeHtml(t("noPaymentsRecorded"))}</td></tr>`;
         }
 
+        function renderOwnerExpenseActions(expense) {
+            if (!expense || !expense.ID) {
+                return "";
+            }
+
+            return `
+                <div class="table-actions">
+                    <button class="secondary-btn action-btn" type="button" onclick="startEditingExpense('${escapeHtml(expense.ID)}')">${escapeHtml(t("editExpenseAction"))}</button>
+                    <button class="danger-btn action-btn" type="button" onclick="deleteExpense('${escapeHtml(expense.ID)}')" ${state.deletingExpenseId === expense.ID ? "disabled" : ""}>${escapeHtml(state.deletingExpenseId === expense.ID ? t("deletingExpense") : t("deleteExpenseAction"))}</button>
+                </div>
+            `;
+        }
+
         function renderDashboard() {
             byId("budgetValue").textContent = formatMoney(state.summary.totalBudget || 0);
             byId("spentValue").textContent = formatMoney(state.summary.total || 0);
@@ -1398,9 +1448,10 @@
                         </td>
                         <td>${escapeHtml(expense.PaidTo)}</td>
                         <td>${formatMoney(expense.Amount)}</td>
+                        <td>${renderOwnerExpenseActions(expense)}</td>
                     </tr>
                 `).join("")
-                : `<tr><td colspan="5" class="muted">${escapeHtml(t("noExpensesRecorded"))}</td></tr>`;
+                : `<tr><td colspan="6" class="muted">${escapeHtml(t("noExpensesRecorded"))}</td></tr>`;
         }
 
         function renderHistory() {
@@ -1417,11 +1468,37 @@
                         </div>
                         <div class="history-actions">
                             ${expense.ScreenshotUrl ? `<a href="${expense.ScreenshotUrl}" target="_blank" rel="noreferrer">${escapeHtml(t("openBill"))}</a>` : ""}
-                            ${expense.ID ? `<button class="danger-btn" type="button" onclick="deleteExpense('${escapeHtml(expense.ID)}')" ${state.deletingExpenseId === expense.ID ? "disabled" : ""}>${escapeHtml(state.deletingExpenseId === expense.ID ? t("deletingExpense") : t("deleteExpenseAction"))}</button>` : ""}
+                            ${renderOwnerExpenseActions(expense)}
                         </div>
                     </article>
                 `).join("")
                 : `<div class="history-item muted">${escapeHtml(t("noExpensesRecorded"))}</div>`;
+        }
+
+        function renderExpenseFormMode() {
+            const isEditing = !!state.editingExpenseId;
+            const saveButton = byId("saveExpenseBtn");
+            const title = byId("expenseFormTitle");
+            const description = byId("expenseFormDescription");
+            const cancelButton = byId("cancelEditBtn");
+            const note = byId("editingExpenseNote");
+
+            title.textContent = t(isEditing ? "editExpenseTitle" : "addExpenseTitle");
+            description.textContent = t(isEditing ? "editExpenseDescription" : "addExpenseDescription");
+
+            if (!saveButton.disabled) {
+                saveButton.textContent = t(isEditing ? "updateExpense" : "saveExpense");
+            }
+
+            cancelButton.classList.toggle("hidden", !isEditing);
+
+            if (isEditing && state.editingExpenseScreenshotUrl) {
+                note.innerHTML = `<a href="${state.editingExpenseScreenshotUrl}" target="_blank" rel="noreferrer">${escapeHtml(t("openBill"))}</a>`;
+                note.classList.remove("hidden");
+            } else {
+                note.textContent = "";
+                note.classList.add("hidden");
+            }
         }
 
         function updateLanguage() {
@@ -1429,6 +1506,7 @@
             renderOwnerLoginMessage();
             renderContractorSelects();
             syncExpenseFormState();
+            renderExpenseFormMode();
             renderContractorPayments();
             renderDashboard();
             renderHistory();
@@ -1453,12 +1531,15 @@
         }
 
         function clearExpenseForm() {
+            state.editingExpenseId = "";
+            state.editingExpenseScreenshotUrl = "";
             byId("expenseForm").reset();
             byId("expenseEntryKind").value = "DirectExpense";
             byId("expensePaidBy").value = "Shreyansh";
             byId("expenseAdvanceParty").value = "Lalu";
             setToday();
             syncExpenseFormState();
+            renderExpenseFormMode();
         }
 
         function logoutOwner() {
@@ -1579,13 +1660,16 @@
 
             const saveButton = byId("saveExpenseBtn");
             saveButton.disabled = true;
-            saveButton.textContent = state.currentLang === "en" ? "Saving..." : "सेव हो रहा है...";
+            saveButton.textContent = state.editingExpenseId
+                ? t("updatingExpense")
+                : state.currentLang === "en" ? "Saving..." : "सेव हो रहा है...";
 
             const entryKind = byId("expenseEntryKind").value;
             const advanceParty = entryKind === "DirectExpense" ? "" : byId("expenseAdvanceParty").value;
+            const isEditing = !!state.editingExpenseId;
 
             try {
-                let screenshotUrl = "";
+                let screenshotUrl = isEditing ? state.editingExpenseScreenshotUrl : "";
                 const file = byId("expenseScreenshot").files[0];
 
                 if (file) {
@@ -1599,8 +1683,9 @@
                     screenshotUrl = upload.url || "";
                 }
 
-                await apiPost("addExpense", {
+                await apiPost(isEditing ? "updateExpense" : "addExpense", {
                     secret: state.ownerSecret,
+                    expenseId: state.editingExpenseId,
                     date: byId("expenseDate").value,
                     category: byId("expenseCategory").value,
                     description: byId("expenseDescription").value.trim(),
@@ -1614,14 +1699,70 @@
                 });
 
                 clearExpenseForm();
-                showBanner(t("expenseSaved"), "success");
+                showBanner(t(isEditing ? "updateExpenseSuccess" : "expenseSaved"), "success");
                 Promise.allSettled([loadDashboard(), loadHistory()]);
             } catch (error) {
                 showBanner(error.message, "error");
             } finally {
                 saveButton.disabled = false;
-                saveButton.textContent = t("saveExpense");
+                renderExpenseFormMode();
             }
+        }
+
+        function getExpenseById(expenseId) {
+            const collections = [state.historyExpenses, state.recentExpenses];
+
+            for (const items of collections) {
+                const match = items.find((expense) => expense.ID === expenseId);
+                if (match) {
+                    return match;
+                }
+            }
+
+            return null;
+        }
+
+        function startEditingExpense(expenseId) {
+            const expense = getExpenseById(expenseId);
+
+            if (!expense) {
+                showBanner(t("editExpenseUnavailable"), "error");
+                return;
+            }
+
+            state.editingExpenseId = expense.ID || "";
+            state.editingExpenseScreenshotUrl = expense.ScreenshotUrl || "";
+
+            switchTab("addExpense");
+
+            byId("expenseDate").value = expense.Date || "";
+            byId("expenseEntryKind").value = expense.EntryKind || "DirectExpense";
+            byId("expensePaidBy").value = expense.PaidBy || "Shreyansh";
+            byId("expenseCategory").value = expense.Category || "Material";
+            byId("expenseAmount").value = expense.Amount || "";
+            byId("expensePaymentMode").value = expense.PaymentMode || "UPI";
+            byId("expenseDescription").value = expense.Description || "";
+            byId("expenseAdvanceParty").value = expense.AdvanceParty || "Lalu";
+
+            syncExpenseFormState();
+
+            if (byId("expensePaidTo")) {
+                const paidToField = byId("expensePaidTo");
+
+                if (paidToField.tagName === "SELECT" && expense.PaidTo) {
+                    const hasOption = Array.from(paidToField.options).some((option) => option.value === expense.PaidTo);
+
+                    if (!hasOption) {
+                        paidToField.insertAdjacentHTML("beforeend", `<option value="${escapeHtml(expense.PaidTo)}">${escapeHtml(expense.PaidTo)}</option>`);
+                    }
+                }
+
+                paidToField.value = expense.PaidTo || "";
+            }
+
+            byId("expenseScreenshot").value = "";
+            renderExpenseFormMode();
+            showBanner(t("editExpenseLoaded"), "info");
         }
 
         async function deleteExpense(expenseId) {
@@ -1642,6 +1783,10 @@
                     secret: state.ownerSecret,
                     expenseId
                 });
+
+                if (state.editingExpenseId === expenseId) {
+                    clearExpenseForm();
+                }
 
                 await Promise.all([loadDashboard(), loadHistory()]);
                 showBanner(t("deleteExpenseSuccess"), "success");
