@@ -575,8 +575,49 @@ function isOwnerPasswordConfigured_() {
 
 function sortExpensesDesc_(expenses) {
   return expenses.slice().sort(function(left, right) {
-    return new Date(right.Date + 'T00:00:00').getTime() - new Date(left.Date + 'T00:00:00').getTime();
+    return getExpenseSortTimestamp_(right) - getExpenseSortTimestamp_(left);
   });
+}
+
+function getExpenseSortTimestamp_(expense) {
+  const rawDate = String(expense.Date || '').trim();
+  const dateTimestamp = parseExpenseTimestamp_(rawDate);
+
+  if (dateTimestamp !== null && hasExplicitExpenseTime_(rawDate)) {
+    return dateTimestamp;
+  }
+
+  const createdAtTimestamp = parseExpenseTimestamp_(expense.CreatedAt);
+  if (createdAtTimestamp !== null) {
+    return createdAtTimestamp;
+  }
+
+  return dateTimestamp !== null ? dateTimestamp : 0;
+}
+
+function parseExpenseTimestamp_(value) {
+  const raw = String(value || '').trim();
+
+  if (!raw) {
+    return null;
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    const dateOnlyMatch = new Date(raw + 'T00:00:00');
+    return isNaN(dateOnlyMatch.getTime()) ? null : dateOnlyMatch.getTime();
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(raw)) {
+    const dateTimeMatch = new Date(raw);
+    return isNaN(dateTimeMatch.getTime()) ? null : dateTimeMatch.getTime();
+  }
+
+  const parsed = new Date(raw);
+  return isNaN(parsed.getTime()) ? null : parsed.getTime();
+}
+
+function hasExplicitExpenseTime_(value) {
+  return /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}/.test(String(value || '').trim());
 }
 
 function requireOwner_(secret) {
@@ -593,7 +634,12 @@ function requireOwner_(secret) {
 
 function normalizeDate_(value) {
   if (Object.prototype.toString.call(value) === '[object Date]' && !isNaN(value)) {
-    return Utilities.formatDate(value, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+    const hasTime = value.getHours() || value.getMinutes() || value.getSeconds() || value.getMilliseconds();
+    return Utilities.formatDate(
+      value,
+      Session.getScriptTimeZone(),
+      hasTime ? "yyyy-MM-dd'T'HH:mm" : 'yyyy-MM-dd'
+    );
   }
 
   return String(value || '');

@@ -704,8 +704,13 @@
                                 <input id="expenseDate" type="date" required />
                             </div>
                             <div class="form-group">
+                                <label for="expenseTime" data-i18n="labelTime">Time</label>
+                                <input id="expenseTime" type="time" />
+                            </div>
+                            <div class="form-group">
                                 <label for="expenseEntryKind" data-i18n="labelEntryKind">Entry Type</label>
                                 <select id="expenseEntryKind" required onchange="syncExpenseFormState()">
+                                    <option value="" data-i18n="selectEntryKind">Select entry type</option>
                                     <option value="DirectExpense" data-i18n="entryDirectExpense">Direct Expense</option>
                                     <option value="AdvanceGiven" data-i18n="entryAdvanceGiven">Advance to Lalu</option>
                                     <option value="AdvanceSettlement" data-i18n="entryAdvanceSettlement">Expense from Lalu Advance</option>
@@ -714,6 +719,7 @@
                             <div class="form-group">
                                 <label for="expensePaidBy" data-i18n="labelPaidBy">Paid By</label>
                                 <select id="expensePaidBy" required onchange="handlePaidByChange()">
+                                    <option value="" data-i18n="selectPaidBy">Select payer</option>
                                     <option value="Shreyansh" data-i18n="payerShreyansh">Shreyansh</option>
                                     <option value="Rajesh" data-i18n="payerRajesh">Rajesh</option>
                                     <option value="Lalu" data-i18n="payerLalu">Lalu</option>
@@ -722,6 +728,7 @@
                             <div class="form-group">
                                 <label for="expenseCategory" data-i18n="labelCategory">Category</label>
                                 <select id="expenseCategory" required onchange="syncExpenseFormState()">
+                                    <option value="" data-i18n="selectCategory">Select category</option>
                                     <option value="Material" data-i18n="categoryMaterial">Material</option>
                                     <option value="Contractor" data-i18n="categoryContractor">Contractor</option>
                                     <option value="Equipment" data-i18n="categoryEquipment">Equipment</option>
@@ -736,6 +743,7 @@
                             <div class="form-group">
                                 <label for="expensePaymentMode" data-i18n="labelPaymentMode">Payment Mode</label>
                                 <select id="expensePaymentMode" required>
+                                    <option value="" data-i18n="selectPaymentMode">Select mode</option>
                                     <option value="UPI" data-i18n="paymentUpi">UPI</option>
                                     <option value="Cash" data-i18n="paymentCash">Cash</option>
                                     <option value="Bank Transfer" data-i18n="paymentBankTransfer">Bank Transfer</option>
@@ -745,6 +753,7 @@
                             <div id="advancePartyGroup" class="form-group hidden">
                                 <label for="expenseAdvanceParty" data-i18n="labelAdvanceParty">Advance Holder</label>
                                 <select id="expenseAdvanceParty" onchange="syncExpenseFormState()">
+                                    <option value="" data-i18n="selectAdvanceParty">Select advance holder</option>
                                     <option value="Lalu" data-i18n="advancePartyLalu">Lalu</option>
                                 </select>
                             </div>
@@ -877,6 +886,7 @@
                 addExpenseTitle: "Add Expense",
                 addExpenseDescription: "Use this form for contractor payments and other construction expenses.",
                 labelDate: "Date",
+                labelTime: "Time",
                 labelEntryKind: "Entry Type",
                 labelPaidBy: "Paid By",
                 labelCategory: "Category",
@@ -903,6 +913,11 @@
                 entryDirectExpense: "Direct Expense",
                 entryAdvanceGiven: "Advance to Lalu",
                 entryAdvanceSettlement: "Expense from Lalu Advance",
+                selectEntryKind: "Select entry type",
+                selectPaidBy: "Select payer",
+                selectCategory: "Select category",
+                selectPaymentMode: "Select mode",
+                selectAdvanceParty: "Select advance holder",
                 payerShreyansh: "Shreyansh",
                 payerRajesh: "Rajesh",
                 payerLalu: "Lalu",
@@ -1004,6 +1019,7 @@
                 addExpenseTitle: "खर्च जोड़ें",
                 addExpenseDescription: "इस फॉर्म का उपयोग ठेकेदार भुगतान और अन्य निर्माण खर्च दर्ज करने के लिए करें।",
                 labelDate: "तारीख",
+                labelTime: "समय",
                 labelEntryKind: "एंट्री प्रकार",
                 labelPaidBy: "किसने भुगतान किया",
                 labelCategory: "श्रेणी",
@@ -1030,6 +1046,11 @@
                 entryDirectExpense: "सीधा खर्च",
                 entryAdvanceGiven: "लालू को एडवांस",
                 entryAdvanceSettlement: "लालू के एडवांस से खर्च",
+                selectEntryKind: "एंट्री प्रकार चुनें",
+                selectPaidBy: "भुगतान करने वाला चुनें",
+                selectCategory: "श्रेणी चुनें",
+                selectPaymentMode: "तरीका चुनें",
+                selectAdvanceParty: "एडवांस होल्डर चुनें",
                 payerShreyansh: "Shreyansh",
                 payerRajesh: "Rajesh",
                 payerLalu: "Lalu",
@@ -1118,8 +1139,10 @@
             deletingExpenseId: "",
             editingExpenseId: "",
             editingExpenseScreenshotUrl: "",
-            manualPaidBy: "Shreyansh"
+            manualPaidBy: ""
         };
+
+        let bannerTimeoutId = null;
 
         const currency = new Intl.NumberFormat("en-IN", {
             style: "currency",
@@ -1141,13 +1164,93 @@
 
         function showBanner(message, tone) {
             const banner = byId("banner");
+            const bannerTone = tone || "info";
+
+            if (bannerTimeoutId) {
+                window.clearTimeout(bannerTimeoutId);
+                bannerTimeoutId = null;
+            }
+
             banner.textContent = message;
-            banner.className = `banner ${tone || "info"}`;
+            banner.className = `banner ${bannerTone}`;
             banner.classList.remove("hidden");
+
+            if (bannerTone !== "error") {
+                bannerTimeoutId = window.setTimeout(() => {
+                    hideBanner();
+                }, 3200);
+            }
         }
 
         function hideBanner() {
+            if (bannerTimeoutId) {
+                window.clearTimeout(bannerTimeoutId);
+                bannerTimeoutId = null;
+            }
+
             byId("banner").classList.add("hidden");
+        }
+
+        function padNumber(value) {
+            return String(value).padStart(2, "0");
+        }
+
+        function formatDateInputValue(date) {
+            return `${date.getFullYear()}-${padNumber(date.getMonth() + 1)}-${padNumber(date.getDate())}`;
+        }
+
+        function formatTimeInputValue(date) {
+            return `${padNumber(date.getHours())}:${padNumber(date.getMinutes())}`;
+        }
+
+        function splitExpenseDateTime(value) {
+            const raw = String(value || "").trim();
+
+            if (!raw) {
+                return { date: "", time: "" };
+            }
+
+            if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+                return { date: raw, time: "" };
+            }
+
+            if (/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}/.test(raw)) {
+                return { date: raw.slice(0, 10), time: raw.slice(11, 16) };
+            }
+
+            const parsed = new Date(raw);
+
+            if (!Number.isNaN(parsed.getTime())) {
+                return {
+                    date: formatDateInputValue(parsed),
+                    time: raw.includes("T") || raw.includes(":")
+                        ? formatTimeInputValue(parsed)
+                        : ""
+                };
+            }
+
+            return { date: raw.slice(0, 10), time: "" };
+        }
+
+        function buildExpenseDateTimeValue(dateValue, timeValue) {
+            const normalizedDate = String(dateValue || "").trim();
+            const normalizedTime = String(timeValue || "").trim();
+
+            if (!normalizedDate) {
+                return "";
+            }
+
+            return normalizedTime ? `${normalizedDate}T${normalizedTime}` : normalizedDate;
+        }
+
+        function formatExpenseDateTime(value) {
+            const parts = splitExpenseDateTime(value);
+
+            if (!parts.date) {
+                return "-";
+            }
+
+            return parts.time ? `${parts.date} ${parts.time}` : parts.date;
         }
 
         function looksLikeHtmlError(text) {
@@ -1349,44 +1452,63 @@
             const categorySelect = byId("expenseCategory");
             const advancePartyGroup = byId("advancePartyGroup");
             const paidBySelect = byId("expensePaidBy");
+            const advancePartySelect = byId("expenseAdvanceParty");
 
             if (entryKind === "AdvanceGiven") {
                 advancePartyGroup.classList.remove("hidden");
-                byId("expenseAdvanceParty").value = "Lalu";
+                if (!advancePartySelect.value) {
+                    advancePartySelect.value = "Lalu";
+                }
                 categorySelect.value = "Advance";
                 categorySelect.disabled = true;
                 paidBySelect.disabled = false;
 
                 if (paidBySelect.value === "Lalu") {
-                    paidBySelect.value = state.manualPaidBy || "Shreyansh";
+                    paidBySelect.value = state.manualPaidBy || "";
                 }
 
                 byId("expenseFlowHint").textContent = t("hintAdvanceGiven");
             } else if (entryKind === "AdvanceSettlement") {
                 advancePartyGroup.classList.remove("hidden");
-                paidBySelect.value = byId("expenseAdvanceParty").value || "Lalu";
+                if (!advancePartySelect.value) {
+                    advancePartySelect.value = "Lalu";
+                }
+
+                paidBySelect.value = advancePartySelect.value || "Lalu";
                 paidBySelect.disabled = true;
                 categorySelect.disabled = false;
 
-                if (categorySelect.value === "Advance") {
+                if (!categorySelect.value || categorySelect.value === "Advance") {
                     categorySelect.value = "Material";
                 }
 
                 byId("expenseFlowHint").textContent = t("hintAdvanceSettlement");
-            } else {
-                advancePartyGroup.classList.toggle("hidden", entryKind !== "AdvanceSettlement");
+            } else if (entryKind === "DirectExpense") {
+                advancePartyGroup.classList.add("hidden");
+                advancePartySelect.value = "";
                 categorySelect.disabled = false;
                 paidBySelect.disabled = false;
 
                 if (categorySelect.value === "Advance") {
-                    categorySelect.value = "Material";
+                    categorySelect.value = "";
                 }
 
                 if (paidBySelect.value === "Lalu") {
-                    paidBySelect.value = state.manualPaidBy || "Shreyansh";
+                    paidBySelect.value = state.manualPaidBy || "";
                 }
 
                 byId("expenseFlowHint").textContent = t("hintDirectExpense");
+            } else {
+                advancePartyGroup.classList.add("hidden");
+                advancePartySelect.value = "";
+                categorySelect.disabled = false;
+                paidBySelect.disabled = false;
+
+                if (paidBySelect.value === "Lalu") {
+                    paidBySelect.value = state.manualPaidBy || "";
+                }
+
+                byId("expenseFlowHint").textContent = "";
             }
 
             renderPaidToInput();
@@ -1439,7 +1561,7 @@
             byId("contractorPaymentsBody").innerHTML = state.contractorPayments.length
                 ? state.contractorPayments.map((payment) => `
                     <tr>
-                        <td>${escapeHtml(payment.Date)}</td>
+                        <td>${escapeHtml(formatExpenseDateTime(payment.Date))}</td>
                         <td>${escapeHtml(payment.Description)}</td>
                         <td>${formatMoney(payment.Amount)}</td>
                         <td>${escapeHtml(payment.PaymentMode)}</td>
@@ -1473,7 +1595,7 @@
             byId("recentExpensesBody").innerHTML = state.recentExpenses.length
                 ? state.recentExpenses.map((expense) => `
                     <tr>
-                        <td>${escapeHtml(expense.Date)}</td>
+                        <td>${escapeHtml(formatExpenseDateTime(expense.Date))}</td>
                         <td>${escapeHtml(getCategoryLabel(expense.Category))}</td>
                         <td>
                             <div>${escapeHtml(expense.Description)}</div>
@@ -1491,7 +1613,7 @@
             byId("historyList").innerHTML = state.historyExpenses.length
                 ? state.historyExpenses.map((expense) => `
                     <article class="history-item">
-                        <strong>${escapeHtml(expense.Date)} · ${escapeHtml(getCategoryLabel(expense.Category))} · ${formatMoney(expense.Amount)}</strong>
+                        <strong>${escapeHtml(formatExpenseDateTime(expense.Date))} · ${escapeHtml(getCategoryLabel(expense.Category))} · ${formatMoney(expense.Amount)}</strong>
                         <div>${escapeHtml(expense.Description)}</div>
                         <div class="muted" style="margin-top: 8px;">
                             ${escapeHtml(t("paidToPrefix"))}: ${escapeHtml(expense.PaidTo || "-")} ·
@@ -1566,11 +1688,14 @@
         function clearExpenseForm() {
             state.editingExpenseId = "";
             state.editingExpenseScreenshotUrl = "";
-            state.manualPaidBy = "Shreyansh";
+            state.manualPaidBy = "";
             byId("expenseForm").reset();
-            byId("expenseEntryKind").value = "DirectExpense";
-            byId("expensePaidBy").value = "Shreyansh";
-            byId("expenseAdvanceParty").value = "Lalu";
+            byId("expenseTime").value = "";
+            byId("expenseEntryKind").value = "";
+            byId("expensePaidBy").value = "";
+            byId("expenseCategory").value = "";
+            byId("expensePaymentMode").value = "";
+            byId("expenseAdvanceParty").value = "";
             setToday();
             syncExpenseFormState();
             renderExpenseFormMode();
@@ -1584,6 +1709,8 @@
 
         function switchTab(tabName) {
             const names = ["dashboard", "addExpense", "history", "settings"];
+
+            hideBanner();
 
             names.forEach((name) => {
                 byId(`${name}Tab`).classList.toggle("active", name === tabName);
@@ -1720,7 +1847,7 @@
                 await apiPost(isEditing ? "updateExpense" : "addExpense", {
                     secret: state.ownerSecret,
                     expenseId: state.editingExpenseId,
-                    date: byId("expenseDate").value,
+                    date: buildExpenseDateTimeValue(byId("expenseDate").value, byId("expenseTime").value),
                     category: byId("expenseCategory").value,
                     description: byId("expenseDescription").value.trim(),
                     amount: byId("expenseAmount").value,
@@ -1767,18 +1894,21 @@
 
             state.editingExpenseId = expense.ID || "";
             state.editingExpenseScreenshotUrl = expense.ScreenshotUrl || "";
-            state.manualPaidBy = expense.PaidBy && expense.PaidBy !== "Lalu" ? expense.PaidBy : "Shreyansh";
+            state.manualPaidBy = expense.PaidBy && expense.PaidBy !== "Lalu" ? expense.PaidBy : "";
+
+            const expenseDateTime = splitExpenseDateTime(expense.Date);
 
             switchTab("addExpense");
 
-            byId("expenseDate").value = expense.Date || "";
+            byId("expenseDate").value = expenseDateTime.date;
+            byId("expenseTime").value = expenseDateTime.time;
             byId("expenseEntryKind").value = expense.EntryKind || "DirectExpense";
-            byId("expensePaidBy").value = expense.PaidBy || "Shreyansh";
-            byId("expenseCategory").value = expense.Category || "Material";
+            byId("expensePaidBy").value = expense.PaidBy || "";
+            byId("expenseCategory").value = expense.Category || "";
             byId("expenseAmount").value = expense.Amount || "";
-            byId("expensePaymentMode").value = expense.PaymentMode || "UPI";
+            byId("expensePaymentMode").value = expense.PaymentMode || "";
             byId("expenseDescription").value = expense.Description || "";
-            byId("expenseAdvanceParty").value = expense.AdvanceParty || "Lalu";
+            byId("expenseAdvanceParty").value = expense.AdvanceParty || "";
 
             syncExpenseFormState();
 
@@ -1880,7 +2010,7 @@
         }
 
         function setToday() {
-            byId("expenseDate").value = new Date().toISOString().slice(0, 10);
+            byId("expenseDate").value = formatDateInputValue(new Date());
         }
 
         function escapeHtml(value) {
