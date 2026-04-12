@@ -1733,6 +1733,7 @@
                 });
 
                 clearExpenseForm();
+                switchTab("addExpense");
                 showBanner(t(isEditing ? "updateExpenseSuccess" : "expenseSaved"), "success");
                 Promise.allSettled([loadDashboard(), loadHistory()]);
             } catch (error) {
