@@ -203,9 +203,9 @@ function addExpense_(payload) {
   const paymentMode = String(payload.paymentMode || '').trim();
   const paidToValue = String(payload.paidTo || '').trim();
   const screenshotUrl = String(payload.screenshotUrl || '').trim();
-  const paidBy = String(payload.paidBy || '').trim();
   const entryKind = String(payload.entryKind || ENTRY_KINDS.DIRECT_EXPENSE).trim();
   const advanceParty = String(payload.advanceParty || '').trim();
+  const paidBy = resolvePaidBy_(String(payload.paidBy || '').trim(), entryKind, advanceParty);
   const paidTo = entryKind === ENTRY_KINDS.ADVANCE_GIVEN && advanceParty
     ? advanceParty
     : paidToValue;
@@ -249,9 +249,9 @@ function updateExpense_(payload) {
   const paymentMode = String(payload.paymentMode || '').trim();
   const paidToValue = String(payload.paidTo || '').trim();
   const screenshotUrl = String(payload.screenshotUrl || '').trim();
-  const paidBy = String(payload.paidBy || '').trim();
   const entryKind = String(payload.entryKind || ENTRY_KINDS.DIRECT_EXPENSE).trim();
   const advanceParty = String(payload.advanceParty || '').trim();
+  const paidBy = resolvePaidBy_(String(payload.paidBy || '').trim(), entryKind, advanceParty);
   const paidTo = entryKind === ENTRY_KINDS.ADVANCE_GIVEN && advanceParty
     ? advanceParty
     : paidToValue;
@@ -463,7 +463,7 @@ function applyExpenseSheetValidations_(sheet) {
   const rulesByHeader = {
     Category: ['Material', 'Contractor', 'Equipment', 'Miscellaneous', 'Advance'],
     PaymentMode: ['UPI', 'Cash', 'Bank Transfer', 'Cheque'],
-    PaidBy: ['Shreyansh', 'Rajesh'],
+    PaidBy: ['Shreyansh', 'Rajesh', 'Lalu'],
     EntryKind: [ENTRY_KINDS.DIRECT_EXPENSE, ENTRY_KINDS.ADVANCE_GIVEN, ENTRY_KINDS.ADVANCE_SETTLEMENT],
     AdvanceParty: ['Lalu']
   };
@@ -559,6 +559,14 @@ function getAllExpenses_() {
 
 function getAdvanceParty_(expense) {
   return String(expense.AdvanceParty || expense.PaidTo || '').trim();
+}
+
+function resolvePaidBy_(paidBy, entryKind, advanceParty) {
+  if (entryKind === ENTRY_KINDS.ADVANCE_SETTLEMENT) {
+    return String(advanceParty || 'Lalu').trim();
+  }
+
+  return String(paidBy || '').trim();
 }
 
 function isOwnerPasswordConfigured_() {
