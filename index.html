@@ -457,6 +457,196 @@
             font-weight: 700;
         }
 
+        .dashboard-visual-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 1fr;
+            gap: 18px;
+            margin-top: 18px;
+        }
+
+        .visual-card {
+            padding: 22px;
+        }
+
+        .visual-title {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .visual-copy {
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .budget-ring-card {
+            display: grid;
+            grid-template-columns: 200px minmax(0, 1fr);
+            gap: 20px;
+            align-items: center;
+        }
+
+        .budget-ring {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background:
+                conic-gradient(var(--accent) 0deg, var(--accent) 0deg, #e4f1ee 0deg, #e4f1ee 360deg);
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .budget-ring::after {
+            content: "";
+            position: absolute;
+            inset: 16px;
+            border-radius: 50%;
+            background: var(--surface-strong);
+            border: 1px solid rgba(227, 239, 236, 0.92);
+        }
+
+        .budget-ring-content {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            gap: 4px;
+            text-align: center;
+        }
+
+        .budget-ring-value {
+            font-size: 34px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .budget-ring-label {
+            color: var(--muted);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .budget-progress-summary {
+            display: grid;
+            gap: 12px;
+        }
+
+        .budget-stat-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 16px;
+            background: #f6fbfa;
+            border: 1px solid var(--border);
+        }
+
+        .budget-stat-row span:first-child {
+            color: var(--muted);
+        }
+
+        .budget-stat-row strong {
+            font-size: 16px;
+        }
+
+        .bars-list {
+            display: grid;
+            gap: 14px;
+            margin-top: 18px;
+        }
+
+        .bar-row {
+            display: grid;
+            gap: 8px;
+        }
+
+        .bar-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        .bar-meta strong {
+            font-size: 15px;
+        }
+
+        .bar-track {
+            height: 12px;
+            border-radius: 999px;
+            background: #e8f3f0;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, var(--accent), #78c0b7);
+        }
+
+        .trend-card {
+            margin-top: 18px;
+        }
+
+        .trend-bars {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 12px;
+            align-items: end;
+            min-height: 220px;
+            margin-top: 20px;
+        }
+
+        .trend-day {
+            display: grid;
+            gap: 10px;
+            justify-items: center;
+        }
+
+        .trend-column-wrap {
+            height: 150px;
+            width: 100%;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 0 6px;
+        }
+
+        .trend-column {
+            width: min(42px, 100%);
+            min-height: 10px;
+            border-radius: 16px 16px 8px 8px;
+            background: linear-gradient(180deg, #8fd2c8, var(--accent));
+            box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.24);
+        }
+
+        .trend-amount {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent-dark);
+            text-align: center;
+        }
+
+        .trend-label {
+            font-size: 12px;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .visual-empty {
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px dashed var(--border);
+            background: #f7fbfa;
+            color: var(--muted);
+            grid-column: 1 / -1;
+        }
+
         .table-actions {
             display: flex;
             gap: 8px;
@@ -466,6 +656,10 @@
         @media (max-width: 1080px) {
             .dashboard-kpi-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .dashboard-visual-grid {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -510,6 +704,15 @@
 
             .dashboard-kpi-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .budget-ring-card {
+                grid-template-columns: 1fr;
+            }
+
+            .trend-bars {
+                gap: 8px;
+                min-height: 180px;
             }
 
             .tab-btn {
@@ -663,6 +866,59 @@
                             <div class="label" data-i18n="laluAdvanceBalance">Lalu Advance Balance</div>
                             <div class="value" id="laluAdvanceBalanceValue">₹0</div>
                         </div>
+                    </div>
+
+                    <div class="dashboard-visual-grid">
+                        <div class="panel visual-card">
+                            <div class="panel-title-row" style="margin-bottom: 0;">
+                                <div>
+                                    <h3 class="visual-title" data-i18n="visualBudgetTitle">Budget Progress</h3>
+                                    <p class="visual-copy" data-i18n="visualBudgetDescription">See how much of the project budget is already used.</p>
+                                </div>
+                            </div>
+                            <div class="budget-ring-card" style="margin-top: 18px;">
+                                <div id="budgetRing" class="budget-ring">
+                                    <div class="budget-ring-content">
+                                        <div id="budgetRingPercent" class="budget-ring-value">0%</div>
+                                        <div class="budget-ring-label" data-i18n="visualUsedLabel">Used</div>
+                                    </div>
+                                </div>
+                                <div class="budget-progress-summary">
+                                    <div class="budget-stat-row">
+                                        <span data-i18n="visualSpentLabel">Spent</span>
+                                        <strong id="visualSpentValue">₹0</strong>
+                                    </div>
+                                    <div class="budget-stat-row">
+                                        <span data-i18n="visualRemainingLabel">Remaining</span>
+                                        <strong id="visualRemainingValue">₹0</strong>
+                                    </div>
+                                    <div class="budget-stat-row">
+                                        <span data-i18n="visualBudgetLabel">Budget</span>
+                                        <strong id="visualBudgetValue">₹0</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel visual-card">
+                            <div class="panel-title-row" style="margin-bottom: 0;">
+                                <div>
+                                    <h3 class="visual-title" data-i18n="visualCategoryTitle">Category Split</h3>
+                                    <p class="visual-copy" data-i18n="visualCategoryDescription">A quick look at where most project money is going.</p>
+                                </div>
+                            </div>
+                            <div id="categoryBars" class="bars-list"></div>
+                        </div>
+                    </div>
+
+                    <div class="panel visual-card trend-card">
+                        <div class="panel-title-row" style="margin-bottom: 0;">
+                            <div>
+                                <h3 class="visual-title" data-i18n="visualTrendTitle">Last 7 Days</h3>
+                                <p class="visual-copy" data-i18n="visualTrendDescription">Daily spending trend for the most recent week.</p>
+                            </div>
+                        </div>
+                        <div id="spendTrend" class="trend-bars"></div>
                     </div>
 
                     <div class="panel" style="margin-top: 18px; padding: 20px;">
@@ -882,6 +1138,18 @@
                 paidToContractors: "Work Payments",
                 materialSpend: "Material Spend",
                 laluAdvanceBalance: "Lalu Advance Balance",
+                visualBudgetTitle: "Budget Progress",
+                visualBudgetDescription: "See how much of the project budget is already used.",
+                visualCategoryTitle: "Category Split",
+                visualCategoryDescription: "A quick look at where most project money is going.",
+                visualTrendTitle: "Last 7 Days",
+                visualTrendDescription: "Daily spending trend for the most recent week.",
+                visualUsedLabel: "Used",
+                visualSpentLabel: "Spent",
+                visualRemainingLabel: "Remaining",
+                visualBudgetLabel: "Budget",
+                visualNoCategoryData: "Add a few expenses to see category trends.",
+                visualNoTrendData: "Recent spending bars will appear here once expenses are added.",
                 recentExpensesTitle: "Recent Expenses",
                 addExpenseTitle: "Add Expense",
                 addExpenseDescription: "Use this form for contractor payments and other construction expenses.",
@@ -1015,6 +1283,18 @@
                 paidToContractors: "कार्य भुगतान",
                 materialSpend: "सामग्री खर्च",
                 laluAdvanceBalance: "लालू एडवांस बैलेंस",
+                visualBudgetTitle: "बजट प्रोग्रेस",
+                visualBudgetDescription: "देखें कि पूरे प्रोजेक्ट बजट का कितना हिस्सा इस्तेमाल हो चुका है।",
+                visualCategoryTitle: "श्रेणी विभाजन",
+                visualCategoryDescription: "एक नज़र में देखें कि पैसा सबसे ज़्यादा किस काम में जा रहा है।",
+                visualTrendTitle: "पिछले 7 दिन",
+                visualTrendDescription: "हाल के सप्ताह का रोज़ाना खर्च रुझान।",
+                visualUsedLabel: "इस्तेमाल",
+                visualSpentLabel: "खर्च",
+                visualRemainingLabel: "बाकी",
+                visualBudgetLabel: "बजट",
+                visualNoCategoryData: "श्रेणी ट्रेंड देखने के लिए कुछ खर्च जोड़ें।",
+                visualNoTrendData: "खर्च जुड़ने के बाद यहां हाल के दिनों की बार दिखाई देंगी।",
                 recentExpensesTitle: "हाल के खर्च",
                 addExpenseTitle: "खर्च जोड़ें",
                 addExpenseDescription: "इस फॉर्म का उपयोग ठेकेदार भुगतान और अन्य निर्माण खर्च दर्ज करने के लिए करें।",
@@ -1439,6 +1719,150 @@
             return labels[entryKind] || t("entryDirectExpense");
         }
 
+        function countsTowardProjectSpend(expense) {
+            return (expense && expense.EntryKind) !== "AdvanceGiven";
+        }
+
+        function formatCompactMoney(value) {
+            const amount = Number(value || 0);
+            const formatter = new Intl.NumberFormat(state.currentLang === "hi" ? "hi-IN" : "en-IN", {
+                notation: "compact",
+                maximumFractionDigits: 1
+            });
+
+            return `${amount < 0 ? "-" : ""}₹${formatter.format(Math.abs(amount))}`;
+        }
+
+        function getCategoryVisualRows() {
+            return [
+                { key: "Material", value: Number(state.summary.Material || 0) },
+                { key: "Contractor", value: Number(state.summary.Contractor || 0) },
+                { key: "Equipment", value: Number(state.summary.Equipment || 0) },
+                { key: "Miscellaneous", value: Number(state.summary.Miscellaneous || 0) }
+            ];
+        }
+
+        function getLatestExpenseAnchorDate() {
+            const timestamps = state.historyExpenses
+                .map((expense) => {
+                    const datePart = splitExpenseDateTime(expense.Date).date;
+                    if (!datePart) {
+                        return null;
+                    }
+
+                    const parsed = new Date(`${datePart}T00:00:00`);
+                    return Number.isNaN(parsed.getTime()) ? null : parsed.getTime();
+                })
+                .filter((value) => value !== null);
+
+            if (!timestamps.length) {
+                return new Date();
+            }
+
+            return new Date(Math.max(...timestamps));
+        }
+
+        function shiftDate(date, days) {
+            const next = new Date(date);
+            next.setDate(next.getDate() + days);
+            return next;
+        }
+
+        function formatTrendDateLabel(date) {
+            return new Intl.DateTimeFormat(state.currentLang === "hi" ? "hi-IN" : "en-IN", {
+                day: "2-digit",
+                month: "short"
+            }).format(date);
+        }
+
+        function getSevenDayTrendRows() {
+            const anchor = getLatestExpenseAnchorDate();
+            const amountsByDay = new Map();
+
+            state.historyExpenses.forEach((expense) => {
+                if (!countsTowardProjectSpend(expense)) {
+                    return;
+                }
+
+                const datePart = splitExpenseDateTime(expense.Date).date;
+
+                if (!datePart) {
+                    return;
+                }
+
+                amountsByDay.set(datePart, (amountsByDay.get(datePart) || 0) + Number(expense.Amount || 0));
+            });
+
+            return Array.from({ length: 7 }, (_, index) => {
+                const currentDate = shiftDate(anchor, index - 6);
+                const key = formatDateInputValue(currentDate);
+                const amount = amountsByDay.get(key) || 0;
+
+                return {
+                    key,
+                    amount,
+                    label: formatTrendDateLabel(currentDate)
+                };
+            });
+        }
+
+        function renderDashboardVisuals() {
+            const totalBudget = Number(state.summary.totalBudget || 0);
+            const totalSpent = Number(state.summary.total || 0);
+            const rawPercent = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
+            const clampedPercent = Math.max(0, Math.min(rawPercent, 100));
+            const remaining = Math.max(totalBudget - totalSpent, 0);
+            const budgetRing = byId("budgetRing");
+            const categoryBars = byId("categoryBars");
+            const spendTrend = byId("spendTrend");
+            const categoryRows = getCategoryVisualRows();
+            const categoryMax = Math.max(...categoryRows.map((row) => row.value), 0);
+            const categoryTotal = categoryRows.reduce((sum, row) => sum + row.value, 0);
+            const trendRows = getSevenDayTrendRows();
+            const trendMax = Math.max(...trendRows.map((row) => row.amount), 0);
+
+            budgetRing.style.background = `conic-gradient(var(--accent) 0deg, var(--accent) ${(clampedPercent / 100) * 360}deg, #e4f1ee ${(clampedPercent / 100) * 360}deg, #e4f1ee 360deg)`;
+            byId("budgetRingPercent").textContent = `${Math.round(rawPercent)}%`;
+            byId("visualSpentValue").textContent = formatMoney(totalSpent);
+            byId("visualRemainingValue").textContent = formatMoney(remaining);
+            byId("visualBudgetValue").textContent = formatMoney(totalBudget);
+
+            categoryBars.innerHTML = categoryTotal > 0
+                ? categoryRows.map((row) => {
+                    const widthPercent = categoryMax > 0 ? (row.value / categoryMax) * 100 : 0;
+                    const sharePercent = categoryTotal > 0 ? Math.round((row.value / categoryTotal) * 100) : 0;
+
+                    return `
+                        <div class="bar-row">
+                            <div class="bar-meta">
+                                <span>${escapeHtml(getCategoryLabel(row.key))}</span>
+                                <strong>${formatMoney(row.value)} · ${sharePercent}%</strong>
+                            </div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: ${widthPercent}%;"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join("")
+                : `<div class="visual-empty">${escapeHtml(t("visualNoCategoryData"))}</div>`;
+
+            spendTrend.innerHTML = trendMax > 0
+                ? trendRows.map((row) => {
+                    const heightPercent = trendMax > 0 ? Math.max((row.amount / trendMax) * 100, row.amount > 0 ? 10 : 0) : 0;
+
+                    return `
+                        <div class="trend-day">
+                            <div class="trend-amount">${escapeHtml(formatCompactMoney(row.amount))}</div>
+                            <div class="trend-column-wrap">
+                                <div class="trend-column" style="height: ${heightPercent}%; opacity: ${row.amount > 0 ? 1 : 0.28};"></div>
+                            </div>
+                            <div class="trend-label">${escapeHtml(row.label)}</div>
+                        </div>
+                    `;
+                }).join("")
+                : `<div class="visual-empty">${escapeHtml(t("visualNoTrendData"))}</div>`;
+        }
+
         function handlePaidByChange() {
             const paidBy = byId("expensePaidBy").value;
 
@@ -1591,6 +2015,7 @@
             byId("materialSpentValue").textContent = formatMoney(state.summary.Material || 0);
             byId("laluAdvanceBalanceValue").textContent = formatMoney(state.summary.laluAdvanceBalance || 0);
             byId("totalBudgetInput").value = Number(state.summary.totalBudget || 0);
+            renderDashboardVisuals();
 
             byId("recentExpensesBody").innerHTML = state.recentExpenses.length
                 ? state.recentExpenses.map((expense) => `
@@ -1814,6 +2239,7 @@
             const data = await apiPost("getExpenses", { secret: state.ownerSecret });
             state.historyExpenses = Array.isArray(data.expenses) ? data.expenses : [];
             renderHistory();
+            renderDashboardVisuals();
         }
 
         async function saveExpense(event) {
