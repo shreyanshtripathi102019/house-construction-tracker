@@ -457,6 +457,58 @@
             font-weight: 700;
         }
 
+        .advance-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .advance-ledger {
+            display: grid;
+            gap: 14px;
+        }
+
+        .advance-row-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .advance-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .advance-pill,
+        .advance-balance-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 7px 11px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .advance-pill.inflow {
+            background: #e8f7ef;
+            color: var(--success);
+        }
+
+        .advance-pill.outflow {
+            background: #fff5f3;
+            color: var(--danger);
+        }
+
+        .advance-balance-pill {
+            background: var(--accent-soft);
+            color: var(--accent-dark);
+        }
+
         .dashboard-visual-grid {
             display: grid;
             grid-template-columns: 1.15fr 1fr;
@@ -840,6 +892,7 @@
                         <button id="tabDashboardBtn" class="tab-btn active" type="button" onclick="switchTab('dashboard')" data-i18n="tabDashboard">Dashboard</button>
                         <button id="tabAddExpenseBtn" class="tab-btn" type="button" onclick="switchTab('addExpense')" data-i18n="tabAddExpense">Add Expense</button>
                         <button id="tabHistoryBtn" class="tab-btn" type="button" onclick="switchTab('history')" data-i18n="tabHistory">History</button>
+                        <button id="tabLaluAdvanceBtn" class="tab-btn" type="button" onclick="switchTab('laluAdvance')" data-i18n="tabLaluAdvance">Lalu Advance</button>
                         <button id="tabSettingsBtn" class="tab-btn" type="button" onclick="switchTab('settings')" data-i18n="tabSettings">Settings</button>
                     </div>
                 </div>
@@ -1052,6 +1105,34 @@
                     <div id="historyList" class="history-list"></div>
                 </section>
 
+                <section id="laluAdvanceTab" class="panel tab-panel">
+                    <div class="panel-title-row">
+                        <div>
+                            <h3 data-i18n="laluAdvanceTabTitle">Lalu Advance Ledger</h3>
+                            <p class="panel-copy" data-i18n="laluAdvanceTabDescription">
+                                See all advance transfers to Lalu, the expenses he paid from that advance, and the current balance.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="advance-summary-grid">
+                        <div class="stats-card accent">
+                            <div class="label" data-i18n="laluAdvanceGivenTotal">Total Advance Given</div>
+                            <div class="value" id="laluAdvanceGivenValue">₹0</div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="label" data-i18n="laluAdvanceSpentTotal">Paid by Lalu</div>
+                            <div class="value" id="laluAdvanceSpentValue">₹0</div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="label" data-i18n="laluAdvanceBalance">Lalu Advance Balance</div>
+                            <div class="value" id="laluAdvanceCurrentBalanceValue">₹0</div>
+                        </div>
+                    </div>
+
+                    <div id="laluAdvanceList" class="advance-ledger"></div>
+                </section>
+
                 <section id="settingsTab" class="panel tab-panel">
                     <div class="form-grid">
                         <form id="budgetForm" class="panel" style="padding: 20px; margin: 0;">
@@ -1132,12 +1213,21 @@
                 tabDashboard: "Dashboard",
                 tabAddExpense: "Add Expense",
                 tabHistory: "History",
+                tabLaluAdvance: "Lalu Advance",
                 tabSettings: "Settings",
                 totalBudget: "Total Budget",
                 totalSpent: "Total Spent",
                 paidToContractors: "Work Payments",
                 materialSpend: "Material Spend",
                 laluAdvanceBalance: "Lalu Advance Balance",
+                laluAdvanceTabTitle: "Lalu Advance Ledger",
+                laluAdvanceTabDescription: "See all advance transfers to Lalu, the expenses he paid from that advance, and the current balance.",
+                laluAdvanceGivenTotal: "Total Advance Given",
+                laluAdvanceSpentTotal: "Paid by Lalu",
+                laluAdvanceEmpty: "No Lalu advance entries have been recorded yet.",
+                laluAdvanceInflow: "Advance Given",
+                laluAdvanceOutflow: "Expense Paid by Lalu",
+                laluAdvanceRunningBalance: "Running Balance",
                 visualBudgetTitle: "Budget Progress",
                 visualBudgetDescription: "See how much of the project budget is already used.",
                 visualCategoryTitle: "Category Split",
@@ -1277,12 +1367,21 @@
                 tabDashboard: "डैशबोर्ड",
                 tabAddExpense: "खर्च जोड़ें",
                 tabHistory: "हिस्ट्री",
+                tabLaluAdvance: "लालू एडवांस",
                 tabSettings: "सेटिंग्स",
                 totalBudget: "कुल बजट",
                 totalSpent: "कुल खर्च",
                 paidToContractors: "कार्य भुगतान",
                 materialSpend: "सामग्री खर्च",
                 laluAdvanceBalance: "लालू एडवांस बैलेंस",
+                laluAdvanceTabTitle: "लालू एडवांस लेजर",
+                laluAdvanceTabDescription: "लालू को दिए गए सभी एडवांस, उस एडवांस से किए गए भुगतान और वर्तमान बैलेंस यहां देखें।",
+                laluAdvanceGivenTotal: "कुल दिया गया एडवांस",
+                laluAdvanceSpentTotal: "लालू द्वारा भुगतान",
+                laluAdvanceEmpty: "अभी तक लालू एडवांस की कोई एंट्री दर्ज नहीं है।",
+                laluAdvanceInflow: "दिया गया एडवांस",
+                laluAdvanceOutflow: "लालू द्वारा खर्च",
+                laluAdvanceRunningBalance: "चलता बैलेंस",
                 visualBudgetTitle: "बजट प्रोग्रेस",
                 visualBudgetDescription: "देखें कि पूरे प्रोजेक्ट बजट का कितना हिस्सा इस्तेमाल हो चुका है।",
                 visualCategoryTitle: "श्रेणी विभाजन",
@@ -1723,6 +1822,46 @@
             return (expense && expense.EntryKind) !== "AdvanceGiven";
         }
 
+        function isLaluAdvanceEntry(expense) {
+            if (!expense) {
+                return false;
+            }
+
+            const entryKind = String(expense.EntryKind || "").trim();
+            const advanceParty = String(expense.AdvanceParty || "").trim().toLowerCase();
+            const paidTo = String(expense.PaidTo || "").trim().toLowerCase();
+            const paidBy = String(expense.PaidBy || "").trim().toLowerCase();
+
+            if (entryKind === "AdvanceGiven") {
+                return advanceParty === "lalu" || paidTo === "lalu";
+            }
+
+            if (entryKind === "AdvanceSettlement") {
+                return advanceParty === "lalu" || paidBy === "lalu";
+            }
+
+            return false;
+        }
+
+        function buildLaluAdvanceLedger() {
+            const rows = state.historyExpenses.filter(isLaluAdvanceEntry);
+            const chronologicalRows = rows.slice().reverse();
+            let runningBalance = 0;
+
+            const enrichedRows = chronologicalRows.map((expense) => {
+                const amount = Number(expense.Amount || 0);
+                const isAdvanceGiven = expense.EntryKind === "AdvanceGiven";
+                runningBalance += isAdvanceGiven ? amount : -amount;
+
+                return {
+                    ...expense,
+                    runningBalance
+                };
+            });
+
+            return enrichedRows.reverse();
+        }
+
         function formatCompactMoney(value) {
             const amount = Number(value || 0);
             const formatter = new Intl.NumberFormat(state.currentLang === "hi" ? "hi-IN" : "en-IN", {
@@ -1861,6 +2000,48 @@
                     `;
                 }).join("")
                 : `<div class="visual-empty">${escapeHtml(t("visualNoTrendData"))}</div>`;
+        }
+
+        function renderLaluAdvance() {
+            const ledgerRows = buildLaluAdvanceLedger();
+            const totalAdvanceGiven = ledgerRows
+                .filter((expense) => expense.EntryKind === "AdvanceGiven")
+                .reduce((sum, expense) => sum + Number(expense.Amount || 0), 0);
+            const totalSpentByLalu = ledgerRows
+                .filter((expense) => expense.EntryKind === "AdvanceSettlement")
+                .reduce((sum, expense) => sum + Number(expense.Amount || 0), 0);
+
+            byId("laluAdvanceGivenValue").textContent = formatMoney(totalAdvanceGiven);
+            byId("laluAdvanceSpentValue").textContent = formatMoney(totalSpentByLalu);
+            byId("laluAdvanceCurrentBalanceValue").textContent = formatMoney(state.summary.laluAdvanceBalance || 0);
+
+            byId("laluAdvanceList").innerHTML = ledgerRows.length
+                ? ledgerRows.map((expense) => {
+                    const isAdvanceGiven = expense.EntryKind === "AdvanceGiven";
+
+                    return `
+                        <article class="history-item">
+                            <div class="advance-row-head">
+                                <strong>${escapeHtml(formatExpenseDateTime(expense.Date))} · ${escapeHtml(getEntryKindLabel(expense.EntryKind))} · ${formatMoney(expense.Amount)}</strong>
+                                <div class="advance-badges">
+                                    <span class="advance-pill ${isAdvanceGiven ? "inflow" : "outflow"}">${escapeHtml(t(isAdvanceGiven ? "laluAdvanceInflow" : "laluAdvanceOutflow"))}</span>
+                                    <span class="advance-balance-pill">${escapeHtml(t("laluAdvanceRunningBalance"))}: ${formatMoney(expense.runningBalance)}</span>
+                                </div>
+                            </div>
+                            <div style="margin-top: 10px;">${escapeHtml(expense.Description || "-")}</div>
+                            <div class="muted" style="margin-top: 8px;">
+                                ${escapeHtml(t("paidToPrefix"))}: ${escapeHtml(expense.PaidTo || "-")} ·
+                                ${escapeHtml(t("paidByPrefix"))}: ${escapeHtml(expense.PaidBy || "-")} ·
+                                ${escapeHtml(t("modePrefix"))}: ${escapeHtml(expense.PaymentMode || "-")}
+                            </div>
+                            <div class="history-actions">
+                                ${expense.ScreenshotUrl ? `<a href="${expense.ScreenshotUrl}" target="_blank" rel="noreferrer">${escapeHtml(t("openBill"))}</a>` : ""}
+                                ${renderOwnerExpenseActions(expense)}
+                            </div>
+                        </article>
+                    `;
+                }).join("")
+                : `<div class="history-item muted">${escapeHtml(t("laluAdvanceEmpty"))}</div>`;
         }
 
         function handlePaidByChange() {
@@ -2090,6 +2271,7 @@
             renderContractorPayments();
             renderDashboard();
             renderHistory();
+            renderLaluAdvance();
         }
 
         function toggleLanguage() {
@@ -2133,7 +2315,7 @@
         }
 
         function switchTab(tabName) {
-            const names = ["dashboard", "addExpense", "history", "settings"];
+            const names = ["dashboard", "addExpense", "history", "laluAdvance", "settings"];
 
             hideBanner();
 
@@ -2239,6 +2421,7 @@
             const data = await apiPost("getExpenses", { secret: state.ownerSecret });
             state.historyExpenses = Array.isArray(data.expenses) ? data.expenses : [];
             renderHistory();
+            renderLaluAdvance();
             renderDashboardVisuals();
         }
 
@@ -2369,6 +2552,7 @@
 
             state.deletingExpenseId = expenseId;
             renderHistory();
+            renderLaluAdvance();
 
             try {
                 await apiPost("deleteExpense", {
@@ -2387,6 +2571,7 @@
             } finally {
                 state.deletingExpenseId = "";
                 renderHistory();
+                renderLaluAdvance();
             }
         }
 
