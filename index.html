@@ -885,7 +885,10 @@
                                 Track budget, work payments, material spending, and all saved expenses.
                             </p>
                         </div>
-                        <button class="secondary-btn" type="button" onclick="logoutOwner()" data-i18n="logout">Exit Dashboard</button>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                            <button class="secondary-btn" type="button" onclick="refreshOwnerData()">↻ Refresh</button>
+                            <button class="secondary-btn" type="button" onclick="logoutOwner()" data-i18n="logout">Exit Dashboard</button>
+                        </div>
                     </div>
 
                     <div class="owner-nav">
@@ -1768,7 +1771,11 @@
                 .map((contractor) => `<option value="${escapeHtml(contractor.Name)}">${escapeHtml(contractor.Name)}</option>`)
                 .join("");
 
-            select.innerHTML = contractorOptions || `<option value="">${escapeHtml(t("noContractorsFound"))}</option>`;
+            if (contractorOptions) {
+                select.innerHTML = `<option value="">— ${escapeHtml(t("contractorNameLabel"))} —</option>` + contractorOptions;
+            } else {
+                select.innerHTML = `<option value="">${escapeHtml(t("noContractorsFound"))}</option>`;
+            }
             select.disabled = !state.contractors.length;
 
             if (selectedValue && state.contractors.some((contractor) => contractor.Name === selectedValue)) {
@@ -1819,7 +1826,7 @@
         }
 
         function countsTowardProjectSpend(expense) {
-            return (expense && expense.EntryKind) !== "AdvanceGiven";
+            return !!(expense && expense.EntryKind !== "AdvanceGiven");
         }
 
         function isLaluAdvanceEntry(expense) {
@@ -2396,6 +2403,7 @@
         }
 
         async function refreshOwnerData() {
+            showBanner("Refreshing…", "info");
             await Promise.all([loadOwnerContractors(), loadDashboard(), loadHistory()]);
         }
 
@@ -2406,6 +2414,8 @@
             try {
                 const data = await apiPost("getContractors", { secret: state.ownerSecret });
                 state.contractors = Array.isArray(data.contractors) ? data.contractors : [];
+            } catch (error) {
+                showBanner(error.message, "error");
             } finally {
                 state.contractorsLoading = false;
                 renderContractorSelects();
@@ -2471,7 +2481,7 @@
                 clearExpenseForm();
                 switchTab("addExpense");
                 showBanner(t(isEditing ? "updateExpenseSuccess" : "expenseSaved"), "success");
-                Promise.allSettled([loadDashboard(), loadHistory()]);
+                await Promise.all([loadDashboard(), loadHistory()]);
             } catch (error) {
                 showBanner(error.message, "error");
             } finally {
