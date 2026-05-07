@@ -426,31 +426,123 @@
             background: #f6fbfa;
         }
 
+        /* ── History filters ── */
+        .history-filters {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .history-search {
+            width: 100%;
+            padding: 9px 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--surface);
+            color: var(--text);
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .filter-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            color: var(--muted);
+            white-space: nowrap;
+            margin-right: 2px;
+        }
+        .filter-pill {
+            padding: 5px 13px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            font-size: 13px;
+            cursor: pointer;
+            transition: background .15s, color .15s;
+            white-space: nowrap;
+        }
+        .filter-pill.active {
+            background: var(--text);
+            color: var(--bg);
+            border-color: var(--text);
+        }
+        .history-summary-row {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+        .history-summary-row strong {
+            color: var(--text);
+        }
+
+        /* ── History cards ── */
         .history-list {
             display: grid;
-            gap: 14px;
+            gap: 10px;
         }
-
         .history-item {
             border: 1px solid var(--border);
-            border-radius: 18px;
-            padding: 18px;
+            border-radius: 16px;
+            padding: 14px 16px;
             background: var(--surface);
         }
-
-        .history-item strong {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 16px;
+        .hi-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 4px;
         }
-
+        .hi-amount {
+            font-size: 17px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .hi-date {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+        .hi-desc {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        .hi-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 8px;
+        }
+        .hi-chip {
+            font-size: 11px;
+            padding: 2px 9px;
+            border-radius: 10px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            font-weight: 500;
+        }
+        .hi-chip.cat { color: var(--text); font-weight: 600; }
+        .hi-chip.advance { background: #fff3cd; border-color: #ffc107; color: #856404; }
+        .hi-chip.settlement { background: #d1e7dd; border-color: #0f5132; color: #0f5132; }
+        [data-theme="dark"] .hi-chip.advance { background: #3d2f00; border-color: #856404; color: #ffc107; }
+        [data-theme="dark"] .hi-chip.settlement { background: #0a2e1a; border-color: #198754; color: #75b798; }
         .history-actions {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: wrap;
-            margin-top: 12px;
+            margin-top: 6px;
         }
-
         .history-actions a {
             display: inline-flex;
             align-items: center;
@@ -885,10 +977,7 @@
                                 Track budget, work payments, material spending, and all saved expenses.
                             </p>
                         </div>
-                        <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                            <button class="secondary-btn" type="button" onclick="refreshOwnerData()">↻ Refresh</button>
-                            <button class="secondary-btn" type="button" onclick="logoutOwner()" data-i18n="logout">Exit Dashboard</button>
-                        </div>
+                        <button class="secondary-btn" type="button" onclick="logoutOwner()" data-i18n="logout">Exit Dashboard</button>
                     </div>
 
                     <div class="owner-nav">
@@ -1100,11 +1189,33 @@
                     <div class="panel-title-row">
                         <div>
                             <h3 data-i18n="historyTitle">Expense History</h3>
-                            <p class="panel-copy" data-i18n="historyDescription">
-                                Every saved payment and purchase appears here in reverse chronological order.
-                            </p>
                         </div>
                     </div>
+
+                    <!-- Filters -->
+                    <div class="history-filters">
+                        <input type="text" id="historySearch" class="history-search"
+                            placeholder="Search description or paid to…"
+                            oninput="renderHistory()" />
+                        <div class="filter-row">
+                            <span class="filter-label" data-i18n="filterCategory">Category</span>
+                            <button class="filter-pill active" data-filter-cat="ALL" onclick="setHistoryFilter('cat','ALL',this)" data-i18n="filterAll">All</button>
+                            <button class="filter-pill" data-filter-cat="Material"    onclick="setHistoryFilter('cat','Material',this)"    data-i18n="categoryMaterial">Material</button>
+                            <button class="filter-pill" data-filter-cat="Contractor"  onclick="setHistoryFilter('cat','Contractor',this)"  data-i18n="categoryContractor">Contractor</button>
+                            <button class="filter-pill" data-filter-cat="Equipment"   onclick="setHistoryFilter('cat','Equipment',this)"   data-i18n="categoryEquipment">Equipment</button>
+                            <button class="filter-pill" data-filter-cat="Miscellaneous" onclick="setHistoryFilter('cat','Miscellaneous',this)" data-i18n="categoryMiscellaneous">Misc</button>
+                            <button class="filter-pill" data-filter-cat="Advance"     onclick="setHistoryFilter('cat','Advance',this)"     data-i18n="categoryAdvance">Advance</button>
+                        </div>
+                        <div class="filter-row">
+                            <span class="filter-label" data-i18n="filterType">Type</span>
+                            <button class="filter-pill active" data-filter-type="ALL"               onclick="setHistoryFilter('type','ALL',this)"               data-i18n="filterAll">All</button>
+                            <button class="filter-pill" data-filter-type="DirectExpense"            onclick="setHistoryFilter('type','DirectExpense',this)"            data-i18n="entryDirectExpense">Direct</button>
+                            <button class="filter-pill" data-filter-type="AdvanceGiven"             onclick="setHistoryFilter('type','AdvanceGiven',this)"             data-i18n="entryAdvanceGiven">Advance</button>
+                            <button class="filter-pill" data-filter-type="AdvanceSettlement"        onclick="setHistoryFilter('type','AdvanceSettlement',this)"        data-i18n="entryAdvanceSettlement">Settlement</button>
+                        </div>
+                    </div>
+
+                    <div id="historySummary" class="history-summary-row"></div>
                     <div id="historyList" class="history-list"></div>
                 </section>
 
@@ -1261,6 +1372,7 @@
                 clearForm: "Clear Form",
                 historyTitle: "Expense History",
                 historyDescription: "Every saved payment and purchase appears here in reverse chronological order.",
+                filterAll: "All", filterCategory: "Category", filterType: "Type",
                 settingsBudgetTitle: "Set Total Budget",
                 settingsBudgetLabel: "Budget Amount",
                 saveBudget: "Save Budget",
@@ -1415,6 +1527,7 @@
                 clearForm: "फॉर्म साफ करें",
                 historyTitle: "खर्च हिस्ट्री",
                 historyDescription: "सहेजे गए सभी भुगतान और खरीद यहां नवीनतम क्रम में दिखेंगे।",
+                filterAll: "सभी", filterCategory: "श्रेणी", filterType: "प्रकार",
                 settingsBudgetTitle: "कुल बजट सेट करें",
                 settingsBudgetLabel: "बजट राशि",
                 saveBudget: "बजट सेव करें",
@@ -1771,11 +1884,7 @@
                 .map((contractor) => `<option value="${escapeHtml(contractor.Name)}">${escapeHtml(contractor.Name)}</option>`)
                 .join("");
 
-            if (contractorOptions) {
-                select.innerHTML = `<option value="">— ${escapeHtml(t("contractorNameLabel"))} —</option>` + contractorOptions;
-            } else {
-                select.innerHTML = `<option value="">${escapeHtml(t("noContractorsFound"))}</option>`;
-            }
+            select.innerHTML = contractorOptions || `<option value="">${escapeHtml(t("noContractorsFound"))}</option>`;
             select.disabled = !state.contractors.length;
 
             if (selectedValue && state.contractors.some((contractor) => contractor.Name === selectedValue)) {
@@ -1826,7 +1935,7 @@
         }
 
         function countsTowardProjectSpend(expense) {
-            return !!(expense && expense.EntryKind !== "AdvanceGiven");
+            return (expense && expense.EntryKind) !== "AdvanceGiven";
         }
 
         function isLaluAdvanceEntry(expense) {
@@ -2222,25 +2331,74 @@
                 : `<tr><td colspan="6" class="muted">${escapeHtml(t("noExpensesRecorded"))}</td></tr>`;
         }
 
+        // ── History filter state ──────────────────────────────────────
+        const historyFilter = { cat: 'ALL', type: 'ALL' };
+
+        function setHistoryFilter(dim, value, btn) {
+            historyFilter[dim] = value;
+            // toggle active pill within that row
+            btn.closest('.filter-row').querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            renderHistory();
+        }
+
         function renderHistory() {
-            byId("historyList").innerHTML = state.historyExpenses.length
-                ? state.historyExpenses.map((expense) => `
+            const search = (byId('historySearch')?.value || '').toLowerCase();
+            const all    = state.historyExpenses || [];
+
+            const filtered = all.filter(e => {
+                if (historyFilter.cat  !== 'ALL' && e.Category  !== historyFilter.cat)  return false;
+                if (historyFilter.type !== 'ALL' && e.EntryKind !== historyFilter.type) return false;
+                if (search) {
+                    const hay = `${e.Description} ${e.PaidTo} ${e.PaidBy}`.toLowerCase();
+                    if (!hay.includes(search)) return false;
+                }
+                return true;
+            });
+
+            // Summary row
+            const total = filtered.reduce((s, e) => s + (countsTowardProjectSpend(e) ? e.Amount : 0), 0);
+            const summaryEl = byId('historySummary');
+            if (summaryEl) {
+                summaryEl.innerHTML = filtered.length
+                    ? `${filtered.length} ${filtered.length === 1 ? 'entry' : 'entries'} · Total spend <strong>${formatMoney(total)}</strong>`
+                    : '';
+            }
+
+            if (!filtered.length) {
+                byId('historyList').innerHTML = `<div class="history-item muted">${escapeHtml(t('noExpensesRecorded'))}</div>`;
+                return;
+            }
+
+            byId('historyList').innerHTML = filtered.map(expense => {
+                const kindClass = expense.EntryKind === 'AdvanceGiven'       ? 'advance'
+                                : expense.EntryKind === 'AdvanceSettlement'  ? 'settlement'
+                                : '';
+                const kindLabel = getEntryKindLabel(expense.EntryKind);
+
+                const chips = [
+                    `<span class="hi-chip cat">${escapeHtml(getCategoryLabel(expense.Category))}</span>`,
+                    kindClass ? `<span class="hi-chip ${kindClass}">${escapeHtml(kindLabel)}</span>` : '',
+                    expense.PaidTo  ? `<span class="hi-chip">→ ${escapeHtml(expense.PaidTo)}</span>`  : '',
+                    expense.PaidBy  ? `<span class="hi-chip">by ${escapeHtml(expense.PaidBy)}</span>` : '',
+                    expense.PaymentMode ? `<span class="hi-chip">${escapeHtml(expense.PaymentMode)}</span>` : '',
+                    expense.AdvanceParty ? `<span class="hi-chip">${escapeHtml(t('advancePartyPrefix'))}: ${escapeHtml(expense.AdvanceParty)}</span>` : '',
+                ].filter(Boolean).join('');
+
+                return `
                     <article class="history-item">
-                        <strong>${escapeHtml(formatExpenseDateTime(expense.Date))} · ${escapeHtml(getCategoryLabel(expense.Category))} · ${formatMoney(expense.Amount)}</strong>
-                        <div>${escapeHtml(expense.Description)}</div>
-                        <div class="muted" style="margin-top: 8px;">
-                            ${escapeHtml(t("paidToPrefix"))}: ${escapeHtml(expense.PaidTo || "-")} ·
-                            ${escapeHtml(t("paidByPrefix"))}: ${escapeHtml(expense.PaidBy || "-")} ·
-                            ${escapeHtml(t("typePrefix"))}: ${escapeHtml(getEntryKindLabel(expense.EntryKind))}${expense.AdvanceParty ? ` · ${escapeHtml(t("advancePartyPrefix"))}: ${escapeHtml(expense.AdvanceParty)}` : ""} ·
-                            ${escapeHtml(t("modePrefix"))}: ${escapeHtml(expense.PaymentMode)}
+                        <div class="hi-date">${escapeHtml(formatExpenseDateTime(expense.Date))}</div>
+                        <div class="hi-top">
+                            <div class="hi-desc">${escapeHtml(expense.Description || '—')}</div>
+                            <div class="hi-amount">${formatMoney(expense.Amount)}</div>
                         </div>
+                        <div class="hi-chips">${chips}</div>
                         <div class="history-actions">
-                            ${expense.ScreenshotUrl ? `<a href="${expense.ScreenshotUrl}" target="_blank" rel="noreferrer">${escapeHtml(t("openBill"))}</a>` : ""}
+                            ${expense.ScreenshotUrl ? `<a href="${expense.ScreenshotUrl}" target="_blank" rel="noreferrer">${escapeHtml(t('openBill'))}</a>` : ''}
                             ${renderOwnerExpenseActions(expense)}
                         </div>
-                    </article>
-                `).join("")
-                : `<div class="history-item muted">${escapeHtml(t("noExpensesRecorded"))}</div>`;
+                    </article>`;
+            }).join('');
         }
 
         function renderExpenseFormMode() {
@@ -2403,7 +2561,6 @@
         }
 
         async function refreshOwnerData() {
-            showBanner("Refreshing…", "info");
             await Promise.all([loadOwnerContractors(), loadDashboard(), loadHistory()]);
         }
 
@@ -2414,8 +2571,6 @@
             try {
                 const data = await apiPost("getContractors", { secret: state.ownerSecret });
                 state.contractors = Array.isArray(data.contractors) ? data.contractors : [];
-            } catch (error) {
-                showBanner(error.message, "error");
             } finally {
                 state.contractorsLoading = false;
                 renderContractorSelects();
@@ -2481,7 +2636,7 @@
                 clearExpenseForm();
                 switchTab("addExpense");
                 showBanner(t(isEditing ? "updateExpenseSuccess" : "expenseSaved"), "success");
-                await Promise.all([loadDashboard(), loadHistory()]);
+                Promise.allSettled([loadDashboard(), loadHistory()]);
             } catch (error) {
                 showBanner(error.message, "error");
             } finally {
