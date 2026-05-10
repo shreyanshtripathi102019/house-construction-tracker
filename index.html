@@ -567,7 +567,24 @@
         .history-actions a {
             display: inline-flex;
             align-items: center;
-            font-weight: 700;
+            gap: 4px;
+            font-size: .8rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--surface-2, #f4f4f5);
+            color: var(--text);
+            text-decoration: none;
+        }
+        .history-actions a:hover {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+        [data-theme="dark"] .history-actions a {
+            background: #2a2a2a;
+            color: var(--text);
         }
 
         .advance-summary-grid {
