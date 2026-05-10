@@ -365,6 +365,27 @@
             grid-column: 1 / -1;
         }
 
+        .proof-row {
+            display: grid;
+            gap: 4px;
+        }
+
+        .proof-slot-lbl {
+            font-size: 0.78rem;
+            font-weight: 500;
+            opacity: 0.65;
+        }
+
+        .proof-existing-link {
+            font-size: 0.78rem;
+            color: var(--accent, #2563eb);
+            text-decoration: none;
+        }
+
+        .proof-existing-link:hover {
+            text-decoration: underline;
+        }
+
         label {
             font-weight: 700;
             font-size: 14px;
@@ -1168,9 +1189,35 @@
                                     <input id="expensePaidTo" type="text" data-i18n-placeholder="paidToPlaceholder" placeholder="Enter vendor or contractor name" required />
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label for="expenseScreenshot" data-i18n="labelScreenshot">Bill / Screenshot</label>
-                                <input id="expenseScreenshot" type="file" accept="image/*" />
+                            <!-- Payment Screenshots (up to 3) -->
+                            <div class="form-group" style="grid-column:1/-1">
+                                <label data-i18n="lblPayScreenshots">Payment Screenshots</label>
+                                <p class="footer-note" data-i18n="payScreenshotHint" style="margin:.2rem 0 .5rem">Upload a screenshot for each payment instalment.</p>
+                                <div style="display:grid;gap:.5rem">
+                                    <div class="proof-row">
+                                        <span class="proof-slot-lbl" data-i18n="lblPayScreenshot1">Screenshot 1</span>
+                                        <input id="expenseScreenshot"  type="file" accept="image/*,application/pdf" />
+                                        <span id="editProof1Link"></span>
+                                    </div>
+                                    <div class="proof-row">
+                                        <span class="proof-slot-lbl" data-i18n="lblPayScreenshot2">Screenshot 2 (optional)</span>
+                                        <input id="expenseScreenshot2" type="file" accept="image/*,application/pdf" />
+                                        <span id="editProof2Link"></span>
+                                    </div>
+                                    <div class="proof-row">
+                                        <span class="proof-slot-lbl" data-i18n="lblPayScreenshot3">Screenshot 3 (optional)</span>
+                                        <input id="expenseScreenshot3" type="file" accept="image/*,application/pdf" />
+                                        <span id="editProof3Link"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Vendor Bill -->
+                            <div class="form-group" style="grid-column:1/-1">
+                                <label data-i18n="lblVendorBill">Vendor Bill (optional)</label>
+                                <div class="proof-row">
+                                    <input id="expenseBill" type="file" accept="image/*,application/pdf" />
+                                    <span id="editBillLink"></span>
+                                </div>
                             </div>
                         </div>
 
@@ -1441,6 +1488,13 @@
                 advancePartyPrefix: "Advance Holder",
                 modePrefix: "Mode",
                 openBill: "Open Bill / Screenshot",
+                lblPayScreenshots: "Payment Screenshots",
+                lblPayScreenshot1: "Screenshot 1",
+                lblPayScreenshot2: "Screenshot 2 (optional)",
+                lblPayScreenshot3: "Screenshot 3 (optional)",
+                lblVendorBill: "Vendor Bill (optional)",
+                payScreenshotHint: "Upload a screenshot for each payment instalment.",
+                pay1: "Pay 1", pay2: "Pay 2", pay3: "Pay 3", openVendorBill: "Bill",
                 ownerPasswordFirst: "Enter the dashboard password first.",
                 checkingPassword: "Checking password...",
                 ownerUnlocked: "Project dashboard opened successfully.",
@@ -1596,6 +1650,13 @@
                 advancePartyPrefix: "एडवांस किसके पास है",
                 modePrefix: "तरीका",
                 openBill: "बिल / स्क्रीनशॉट खोलें",
+                lblPayScreenshots: "भुगतान स्क्रीनशॉट",
+                lblPayScreenshot1: "स्क्रीनशॉट 1",
+                lblPayScreenshot2: "स्क्रीनशॉट 2 (वैकल्पिक)",
+                lblPayScreenshot3: "स्क्रीनशॉट 3 (वैकल्पिक)",
+                lblVendorBill: "विक्रेता बिल (वैकल्पिक)",
+                payScreenshotHint: "प्रत्येक किश्त के भुगतान का स्क्रीनशॉट अपलोड करें।",
+                pay1: "भुगतान 1", pay2: "भुगतान 2", pay3: "भुगतान 3", openVendorBill: "बिल",
                 ownerPasswordFirst: "पहले डैशबोर्ड पासवर्ड दर्ज करें।",
                 checkingPassword: "पासवर्ड जांचा जा रहा है...",
                 ownerUnlocked: "प्रोजेक्ट डैशबोर्ड सफलतापूर्वक खुल गया।",
@@ -1633,7 +1694,10 @@
             contractorsLoading: false,
             deletingExpenseId: "",
             editingExpenseId: "",
-            editingExpenseScreenshotUrl: "",
+            editingExpenseScreenshotUrl:  "",
+            editingExpenseScreenshotUrl2: "",
+            editingExpenseScreenshotUrl3: "",
+            editingExpenseBillUrl:        "",
             manualPaidBy: ""
         };
 
@@ -2151,7 +2215,7 @@
                                 ${escapeHtml(t("modePrefix"))}: ${escapeHtml(expense.PaymentMode || "-")}
                             </div>
                             <div class="history-actions">
-                                ${expense.ScreenshotUrl ? `<a href="${expense.ScreenshotUrl}" target="_blank" rel="noreferrer">${escapeHtml(t("openBill"))}</a>` : ""}
+                                ${renderAttachmentLinks(expense)}
                                 ${renderOwnerExpenseActions(expense)}
                             </div>
                         </article>
@@ -2286,10 +2350,19 @@
                         <td>${escapeHtml(payment.Description)}</td>
                         <td>${formatMoney(payment.Amount)}</td>
                         <td>${escapeHtml(payment.PaymentMode)}</td>
-                        <td>${payment.ScreenshotUrl ? `<a href="${payment.ScreenshotUrl}" target="_blank" rel="noreferrer">${escapeHtml(t("viewProof"))}</a>` : "-"}</td>
+                        <td>${renderAttachmentLinks(payment) || "-"}</td>
                     </tr>
                 `).join("")
                 : `<tr><td colspan="5" class="muted">${escapeHtml(t("noPaymentsRecorded"))}</td></tr>`;
+        }
+
+        function renderAttachmentLinks(expense) {
+            const links = [];
+            if (expense.ScreenshotUrl)  links.push(`<a href="${expense.ScreenshotUrl}"  target="_blank" rel="noreferrer">${escapeHtml(t('pay1'))}</a>`);
+            if (expense.ScreenshotUrl2) links.push(`<a href="${expense.ScreenshotUrl2}" target="_blank" rel="noreferrer">${escapeHtml(t('pay2'))}</a>`);
+            if (expense.ScreenshotUrl3) links.push(`<a href="${expense.ScreenshotUrl3}" target="_blank" rel="noreferrer">${escapeHtml(t('pay3'))}</a>`);
+            if (expense.BillUrl)        links.push(`<a href="${expense.BillUrl}"        target="_blank" rel="noreferrer">📄 ${escapeHtml(t('openVendorBill'))}</a>`);
+            return links.join('');
         }
 
         function renderOwnerExpenseActions(expense) {
@@ -2394,7 +2467,7 @@
                         </div>
                         <div class="hi-chips">${chips}</div>
                         <div class="history-actions">
-                            ${expense.ScreenshotUrl ? `<a href="${expense.ScreenshotUrl}" target="_blank" rel="noreferrer">${escapeHtml(t('openBill'))}</a>` : ''}
+                            ${renderAttachmentLinks(expense)}
                             ${renderOwnerExpenseActions(expense)}
                         </div>
                     </article>`;
@@ -2418,13 +2491,22 @@
 
             cancelButton.classList.toggle("hidden", !isEditing);
 
-            if (isEditing && state.editingExpenseScreenshotUrl) {
-                note.innerHTML = `<a href="${state.editingExpenseScreenshotUrl}" target="_blank" rel="noreferrer">${escapeHtml(t("openBill"))}</a>`;
-                note.classList.remove("hidden");
-            } else {
-                note.textContent = "";
-                note.classList.add("hidden");
+            // Show existing attachment links when editing
+            function setProofLink(spanId, url, label) {
+                const el = byId(spanId);
+                if (!el) return;
+                el.innerHTML = isEditing && url
+                    ? `<a href="${url}" target="_blank" rel="noreferrer" class="proof-existing-link">↗ Current: ${escapeHtml(label)}</a>`
+                    : '';
             }
+            setProofLink('editProof1Link', state.editingExpenseScreenshotUrl,  t('pay1'));
+            setProofLink('editProof2Link', state.editingExpenseScreenshotUrl2, t('pay2'));
+            setProofLink('editProof3Link', state.editingExpenseScreenshotUrl3, t('pay3'));
+            setProofLink('editBillLink',   state.editingExpenseBillUrl,        t('openVendorBill'));
+
+            // Legacy note area (keep hidden now — replaced by inline links above)
+            note.textContent = "";
+            note.classList.add("hidden");
         }
 
         function updateLanguage() {
@@ -2459,8 +2541,12 @@
 
         function clearExpenseForm() {
             state.editingExpenseId = "";
-            state.editingExpenseScreenshotUrl = "";
+            state.editingExpenseScreenshotUrl  = "";
+            state.editingExpenseScreenshotUrl2 = "";
+            state.editingExpenseScreenshotUrl3 = "";
+            state.editingExpenseBillUrl        = "";
             state.manualPaidBy = "";
+            ['editProof1Link','editProof2Link','editProof3Link','editBillLink'].forEach(id => { const el = byId(id); if (el) el.innerHTML = ''; });
             byId("expenseForm").reset();
             byId("expenseTime").value = "";
             byId("expenseEntryKind").value = "";
@@ -2604,10 +2690,8 @@
             const isEditing = !!state.editingExpenseId;
 
             try {
-                let screenshotUrl = isEditing ? state.editingExpenseScreenshotUrl : "";
-                const file = byId("expenseScreenshot").files[0];
-
-                if (file) {
+                // Helper: upload one file via Apps Script, return its URL
+                async function uploadOneFile(file) {
                     const dataUrl = await fileToDataUrl(file);
                     const upload = await apiPost("uploadImage", {
                         secret: state.ownerSecret,
@@ -2615,8 +2699,25 @@
                         mimeType: file.type,
                         fileName: file.name
                     });
-                    screenshotUrl = upload.url || "";
+                    return upload.url || "";
                 }
+
+                let screenshotUrl  = isEditing ? state.editingExpenseScreenshotUrl  : "";
+                let screenshotUrl2 = isEditing ? state.editingExpenseScreenshotUrl2 : "";
+                let screenshotUrl3 = isEditing ? state.editingExpenseScreenshotUrl3 : "";
+                let billUrl        = isEditing ? state.editingExpenseBillUrl        : "";
+
+                const file1 = byId("expenseScreenshot")?.files[0];
+                if (file1) screenshotUrl = await uploadOneFile(file1);
+
+                const file2 = byId("expenseScreenshot2")?.files[0];
+                if (file2) screenshotUrl2 = await uploadOneFile(file2);
+
+                const file3 = byId("expenseScreenshot3")?.files[0];
+                if (file3) screenshotUrl3 = await uploadOneFile(file3);
+
+                const fileBill = byId("expenseBill")?.files[0];
+                if (fileBill) billUrl = await uploadOneFile(fileBill);
 
                 await apiPost(isEditing ? "updateExpense" : "addExpense", {
                     secret: state.ownerSecret,
@@ -2628,6 +2729,9 @@
                     paymentMode: byId("expensePaymentMode").value,
                     paidTo: byId("expensePaidTo").value.trim(),
                     screenshotUrl,
+                    screenshotUrl2,
+                    screenshotUrl3,
+                    billUrl,
                     paidBy: byId("expensePaidBy").value,
                     entryKind,
                     advanceParty
@@ -2667,7 +2771,10 @@
             }
 
             state.editingExpenseId = expense.ID || "";
-            state.editingExpenseScreenshotUrl = expense.ScreenshotUrl || "";
+            state.editingExpenseScreenshotUrl  = expense.ScreenshotUrl  || "";
+            state.editingExpenseScreenshotUrl2 = expense.ScreenshotUrl2 || "";
+            state.editingExpenseScreenshotUrl3 = expense.ScreenshotUrl3 || "";
+            state.editingExpenseBillUrl        = expense.BillUrl        || "";
             state.manualPaidBy = expense.PaidBy && expense.PaidBy !== "Lalu" ? expense.PaidBy : "";
 
             const expenseDateTime = splitExpenseDateTime(expense.Date);
@@ -2700,7 +2807,7 @@
                 paidToField.value = expense.PaidTo || "";
             }
 
-            byId("expenseScreenshot").value = "";
+            ['expenseScreenshot','expenseScreenshot2','expenseScreenshot3','expenseBill'].forEach(id => { const el = byId(id); if (el) el.value = ''; });
             renderExpenseFormMode();
             showBanner(t("editExpenseLoaded"), "info");
         }

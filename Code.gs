@@ -202,7 +202,10 @@ function addExpense_(payload) {
   const amount = toNumber_(payload.amount);
   const paymentMode = String(payload.paymentMode || '').trim();
   const paidToValue = String(payload.paidTo || '').trim();
-  const screenshotUrl = String(payload.screenshotUrl || '').trim();
+  const screenshotUrl  = String(payload.screenshotUrl  || '').trim();
+  const screenshotUrl2 = String(payload.screenshotUrl2 || '').trim();
+  const screenshotUrl3 = String(payload.screenshotUrl3 || '').trim();
+  const billUrl        = String(payload.billUrl        || '').trim();
   const entryKind = String(payload.entryKind || ENTRY_KINDS.DIRECT_EXPENSE).trim();
   const advanceParty = String(payload.advanceParty || '').trim();
   const paidBy = resolvePaidBy_(String(payload.paidBy || '').trim(), entryKind, advanceParty);
@@ -232,7 +235,10 @@ function addExpense_(payload) {
     new Date().toISOString(),
     paidBy,
     entryKind,
-    advanceParty
+    advanceParty,
+    screenshotUrl2,
+    screenshotUrl3,
+    billUrl
   ]);
 
   return { success: true };
@@ -248,7 +254,10 @@ function updateExpense_(payload) {
   const amount = toNumber_(payload.amount);
   const paymentMode = String(payload.paymentMode || '').trim();
   const paidToValue = String(payload.paidTo || '').trim();
-  const screenshotUrl = String(payload.screenshotUrl || '').trim();
+  const screenshotUrl  = String(payload.screenshotUrl  || '').trim();
+  const screenshotUrl2 = String(payload.screenshotUrl2 || '').trim();
+  const screenshotUrl3 = String(payload.screenshotUrl3 || '').trim();
+  const billUrl        = String(payload.billUrl        || '').trim();
   const entryKind = String(payload.entryKind || ENTRY_KINDS.DIRECT_EXPENSE).trim();
   const advanceParty = String(payload.advanceParty || '').trim();
   const paidBy = resolvePaidBy_(String(payload.paidBy || '').trim(), entryKind, advanceParty);
@@ -274,10 +283,12 @@ function updateExpense_(payload) {
     throw new Error('Expense not found.');
   }
 
-  const existingRow = sheet.getRange(rowToUpdate, 1, 1, 12).getValues()[0];
+  // Read up to 15 columns (existing rows may only have 12 — that's fine)
+  const totalCols = Math.max(sheet.getLastColumn(), 15);
+  const existingRow = sheet.getRange(rowToUpdate, 1, 1, totalCols).getValues()[0];
   const createdAt = existingRow[8] || new Date().toISOString();
 
-  sheet.getRange(rowToUpdate, 1, 1, 12).setValues([[
+  sheet.getRange(rowToUpdate, 1, 1, 15).setValues([[
     expenseId,
     date,
     category,
@@ -289,7 +300,10 @@ function updateExpense_(payload) {
     createdAt,
     paidBy,
     entryKind,
-    advanceParty
+    advanceParty,
+    screenshotUrl2,
+    screenshotUrl3,
+    billUrl
   ]]);
 
   return { success: true };
@@ -424,7 +438,7 @@ function getSpreadsheet_() {
 function ensureStructure_(spreadsheet) {
   const settingsSheet = ensureSheet_(spreadsheet, SHEET_NAMES.SETTINGS, ['Key', 'Value']);
   const contractorsSheet = ensureSheet_(spreadsheet, SHEET_NAMES.CONTRACTORS, ['Name', 'Phone', 'WorkType', 'AgreedAmount']);
-  const expensesSheet = ensureSheet_(spreadsheet, SHEET_NAMES.EXPENSES, ['ID', 'Date', 'Category', 'Description', 'Amount', 'PaymentMode', 'PaidTo', 'ScreenshotUrl', 'CreatedAt', 'PaidBy', 'EntryKind', 'AdvanceParty']);
+  const expensesSheet = ensureSheet_(spreadsheet, SHEET_NAMES.EXPENSES, ['ID', 'Date', 'Category', 'Description', 'Amount', 'PaymentMode', 'PaidTo', 'ScreenshotUrl', 'CreatedAt', 'PaidBy', 'EntryKind', 'AdvanceParty', 'ScreenshotUrl2', 'ScreenshotUrl3', 'BillUrl']);
 
   settingsSheet.setFrozenRows(1);
   contractorsSheet.setFrozenRows(1);
@@ -443,16 +457,20 @@ function ensureSheet_(spreadsheet, name, headers) {
 
   if (!sheet) {
     sheet = spreadsheet.insertSheet(name);
-  }
-
-  const currentHeaders = sheet.getRange(1, 1, 1, headers.length).getValues()[0];
-  const hasHeaders = headers.every(function(header, index) {
-    return currentHeaders[index] === header;
-  });
-
-  if (!hasHeaders) {
     sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    return sheet;
   }
+
+  // Read existing headers (as many columns as the sheet currently has)
+  const lastCol = Math.max(sheet.getLastColumn(), 1);
+  const existingHeaders = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+
+  // Add any headers that are missing (append to the right)
+  headers.forEach(function(header, index) {
+    if (existingHeaders[index] !== header) {
+      sheet.getRange(1, index + 1).setValue(header);
+    }
+  });
 
   return sheet;
 }
@@ -548,7 +566,10 @@ function getAllExpenses_() {
       Amount: toNumber_(expense.Amount),
       PaymentMode: expense.PaymentMode || '',
       PaidTo: expense.PaidTo || '',
-      ScreenshotUrl: expense.ScreenshotUrl || '',
+      ScreenshotUrl:  expense.ScreenshotUrl  || '',
+      ScreenshotUrl2: expense.ScreenshotUrl2 || '',
+      ScreenshotUrl3: expense.ScreenshotUrl3 || '',
+      BillUrl:        expense.BillUrl        || '',
       CreatedAt: expense.CreatedAt || '',
       PaidBy: expense.PaidBy || '',
       EntryKind: expense.EntryKind || ENTRY_KINDS.DIRECT_EXPENSE,
