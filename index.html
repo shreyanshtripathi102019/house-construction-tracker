@@ -1097,6 +1097,16 @@
                     <div class="panel visual-card trend-card">
                         <div class="panel-title-row" style="margin-bottom: 0;">
                             <div>
+                                <h3 class="visual-title" data-i18n="visualPaidByTitle">Paid By</h3>
+                                <p class="visual-copy" data-i18n="visualPaidByDescription">Total project spend paid by each person. Lalu's spend is credited to whoever funded his advance.</p>
+                            </div>
+                        </div>
+                        <div id="paidByBars" class="bars-list"></div>
+                    </div>
+
+                    <div class="panel visual-card trend-card">
+                        <div class="panel-title-row" style="margin-bottom: 0;">
+                            <div>
                                 <h3 class="visual-title" data-i18n="visualTrendTitle">Last 7 Days</h3>
                                 <p class="visual-copy" data-i18n="visualTrendDescription">Daily spending trend for the most recent week.</p>
                             </div>
@@ -1417,6 +1427,10 @@
                 visualRemainingLabel: "Remaining",
                 visualBudgetLabel: "Budget",
                 visualNoCategoryData: "Add a few expenses to see category trends.",
+                visualPaidByTitle: "Paid By",
+                visualPaidByDescription: "Total project spend paid by each person. Lalu's spend is credited to whoever funded his advance.",
+                visualPaidByViaLalu: "Includes spent via Lalu",
+                visualNoPaidByData: "Add a few expenses to see who paid how much.",
                 visualNoTrendData: "Recent spending bars will appear here once expenses are added.",
                 recentExpensesTitle: "Recent Expenses",
                 addExpenseTitle: "Add Expense",
@@ -1579,6 +1593,10 @@
                 visualRemainingLabel: "बाकी",
                 visualBudgetLabel: "बजट",
                 visualNoCategoryData: "श्रेणी ट्रेंड देखने के लिए कुछ खर्च जोड़ें।",
+                visualPaidByTitle: "किसने भुगतान किया",
+                visualPaidByDescription: "हर व्यक्ति द्वारा किया गया कुल प्रोजेक्ट खर्च। लालू का खर्च उसे एडवांस देने वाले के नाम जोड़ा गया है।",
+                visualPaidByViaLalu: "लालू के ज़रिए खर्च शामिल",
+                visualNoPaidByData: "किसने कितना दिया, यह देखने के लिए कुछ खर्च जोड़ें।",
                 visualNoTrendData: "खर्च जुड़ने के बाद यहां हाल के दिनों की बार दिखाई देंगी।",
                 recentExpensesTitle: "हाल के खर्च",
                 addExpenseTitle: "खर्च जोड़ें",
@@ -2078,6 +2096,57 @@
             ];
         }
 
+        // Lalu only spends advance money, so his spend is credited back to whoever
+        // funded the advance, in proportion to how much each person gave him.
+        function getPaidByVisualRows() {
+            const direct = {};
+            const advanceGiven = {};
+            let laluSpent = 0;
+
+            state.historyExpenses.forEach((expense) => {
+                const amount = Number(expense.Amount || 0);
+                const payer = String(expense.PaidBy || "").trim() || "-";
+
+                if (isLaluAdvanceEntry(expense) && expense.EntryKind === "AdvanceGiven") {
+                    advanceGiven[payer] = (advanceGiven[payer] || 0) + amount;
+                    return;
+                }
+
+                if (!countsTowardProjectSpend(expense)) {
+                    return;
+                }
+
+                if (payer.toLowerCase() === "lalu") {
+                    laluSpent += amount;
+                    return;
+                }
+
+                direct[payer] = (direct[payer] || 0) + amount;
+            });
+
+            const totalAdvanceGiven = Object.values(advanceGiven).reduce((sum, value) => sum + value, 0);
+            const viaLalu = {};
+
+            if (totalAdvanceGiven > 0) {
+                Object.keys(advanceGiven).forEach((giver) => {
+                    viaLalu[giver] = laluSpent * (advanceGiven[giver] / totalAdvanceGiven);
+                });
+            } else if (laluSpent > 0) {
+                direct.Lalu = laluSpent;
+            }
+
+            const payers = new Set([...Object.keys(direct), ...Object.keys(viaLalu)]);
+
+            return [...payers]
+                .map((key) => ({
+                    key,
+                    viaLalu: viaLalu[key] || 0,
+                    value: (direct[key] || 0) + (viaLalu[key] || 0)
+                }))
+                .filter((row) => row.value > 0)
+                .sort((a, b) => b.value - a.value);
+        }
+
         function getLatestExpenseAnchorDate() {
             const timestamps = state.historyExpenses
                 .map((expense) => {
@@ -2181,6 +2250,30 @@
                     `;
                 }).join("")
                 : `<div class="visual-empty">${escapeHtml(t("visualNoCategoryData"))}</div>`;
+
+            const paidByRows = getPaidByVisualRows();
+            const paidByMax = Math.max(...paidByRows.map((row) => row.value), 0);
+            const paidByTotal = paidByRows.reduce((sum, row) => sum + row.value, 0);
+
+            byId("paidByBars").innerHTML = paidByTotal > 0
+                ? paidByRows.map((row) => {
+                    const widthPercent = paidByMax > 0 ? (row.value / paidByMax) * 100 : 0;
+                    const sharePercent = Math.round((row.value / paidByTotal) * 100);
+
+                    return `
+                        <div class="bar-row">
+                            <div class="bar-meta">
+                                <span>${escapeHtml(row.key)}</span>
+                                <strong>${formatMoney(row.value)} · ${sharePercent}%</strong>
+                            </div>
+                            ${row.viaLalu > 0 ? `<div class="muted" style="font-size: 13px; margin-top: -4px;">${escapeHtml(t("visualPaidByViaLalu"))}: ${formatMoney(Math.round(row.viaLalu))}</div>` : ""}
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: ${widthPercent}%;"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join("")
+                : `<div class="visual-empty">${escapeHtml(t("visualNoPaidByData"))}</div>`;
 
             spendTrend.innerHTML = trendMax > 0
                 ? trendRows.map((row) => {
